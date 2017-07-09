@@ -1,0 +1,692 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="在es6之前，js不像其他语言自带成熟的模块化功能，页面只能靠插入一个个script标签来引入自己的或第三方的脚本，并且容易带来命名冲突的问题。js社区做了很多努力，在当时的运行环境中，实现”模块”的效果。通用的js模块化标准有CommonJS与AMD，前者运用于node环境，后者在浏览器环境中由Require.js等实现。此外还有国内的开源项目Sea.js，遵循CMD规范。（目前随着es6的普及">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动手实现一个简单的浏览器端js模块加载器">
+<meta property="og:url" content="http://blog.webtoatl.cn/2017/07/03/动手实现一个简单的浏览器端js模块加载器/index.html">
+<meta property="og:site_name" content="赖宝的宝">
+<meta property="og:description" content="在es6之前，js不像其他语言自带成熟的模块化功能，页面只能靠插入一个个script标签来引入自己的或第三方的脚本，并且容易带来命名冲突的问题。js社区做了很多努力，在当时的运行环境中，实现”模块”的效果。通用的js模块化标准有CommonJS与AMD，前者运用于node环境，后者在浏览器环境中由Require.js等实现。此外还有国内的开源项目Sea.js，遵循CMD规范。（目前随着es6的普及">
+<meta property="og:updated_time" content="2017-07-07T13:08:55.524Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="动手实现一个简单的浏览器端js模块加载器">
+<meta name="twitter:description" content="在es6之前，js不像其他语言自带成熟的模块化功能，页面只能靠插入一个个script标签来引入自己的或第三方的脚本，并且容易带来命名冲突的问题。js社区做了很多努力，在当时的运行环境中，实现”模块”的效果。通用的js模块化标准有CommonJS与AMD，前者运用于node环境，后者在浏览器环境中由Require.js等实现。此外还有国内的开源项目Sea.js，遵循CMD规范。（目前随着es6的普及">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.webtoatl.cn/2017/07/03/动手实现一个简单的浏览器端js模块加载器/"/>
+
+
+
+
+
+  <title> 动手实现一个简单的浏览器端js模块加载器 | 赖宝的宝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">赖宝的宝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">前端技能分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/03/动手实现一个简单的浏览器端js模块加载器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                动手实现一个简单的浏览器端js模块加载器
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-03T00:00:00+08:00">
+                2017-07-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在es6之前，js不像其他语言自带成熟的模块化功能，页面只能靠插入一个个script标签来引入自己的或第三方的脚本，并且容易带来命名冲突的问题。js社区做了很多努力，在当时的运行环境中，实现”模块”的效果。<br>通用的js模块化标准有CommonJS与AMD，前者运用于node环境，后者在浏览器环境中由Require.js等实现。此外还有国内的开源项目Sea.js，遵循CMD规范。（目前随着es6的普及已经停止维护，不论是AMD还是CMD，都将是一段历史了）</p>
+<h3 id="浏览器端js加载器"><a href="#浏览器端js加载器" class="headerlink" title="浏览器端js加载器"></a>浏览器端js加载器</h3><p>实现一个简单的js加载器并不复杂，主要可以分为 <strong>解析路径、下载模块、解析模块依赖、解析模块</strong> 四个步骤。<br>首先定义一下模块。在各种规范中，通常一个js文件即表示一个模块。那么，我们可以在模块文件中，构造一个闭包，并传出一个对象，作为模块的导出：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">define(factory() &#123;</div><div class="line">    <span class="keyword">var</span> x = &#123;</div><div class="line">        <span class="attr">a</span>: <span class="number">1</span></div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> x;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>define函数接收一个工厂函数参数，浏览器执行该脚本时，define函数执行factory，并把它的return值存储在加载器的模块对象modules里。<br>如何 <strong>标识</strong> 一个模块呢？可以用文件的 <strong>uri</strong>，它是唯一标识，是天然的id。<br>文件路径path有几种形式：</p>
+<p>绝对路径：<a href="http://xxx" target="_blank" rel="external">http://xxx</a>, file://xxx</p>
+<p>相对路径：./xxx ， ../xxx ， xxx(相对当前页面的文件路径)</p>
+<p>虚拟绝对路径：/xxx /表示网站根目录<br>因此，需要一个resolvePath函数来将不同形式的path解析成uri，参照当前页面的文件路径来解析。</p>
+<p>接着，假设我们需要引用a.js与b.js两个模块，并设置了需要a与b才能执行的回调函数f。我们希望加载器去拉取a与b，当a与b都加载完成后，从modules里取出a与b作为参数传给f，执行下一步操作。这里可以用观察者模式（即订阅/发布模式）实现，创建一个eventProxy，订阅加载a与加载b事件；define函数执行到最后，已经把导出挂载modules里之后，emit一个本模块加载完成的事件，eventProxy收到后检查a与b是否都加载完成，如果完成，就传参给f执行回调。</p>
+<p>同理，eventProxy也可以实现模块依赖加载<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line">define([ <span class="string">'c.js'</span>, <span class="string">'d.js'</span> ], factory (c, d) &#123;</div><div class="line">    <span class="keyword">var</span> x = c + d;</div><div class="line">    <span class="keyword">return</span> x;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>define函数的第一个参数可以传入一个依赖数组，表示a模块依赖c与d。define执行时，告诉eventProxy订阅c与d加载事件，加载好了就执行回调函数f存储a的导出，并emit事件a已加载。</p>
+<p>浏览器端加载脚本的原始方法是插入一个 <strong>script</strong> 标签，指定src之后，浏览器开始下载该脚本。<br>那么加载器中的模块加载可以用dom操作实现，插入一个script标签并指定src，此时该模块为下载中状态。<br>PS：浏览器中，动态插入script标签与初次加载页面dom时的script加载方式不同：</p>
+<p>初次加载页面，浏览器会从上到下顺序解析dom，碰到script标签时，下载脚本并阻塞dom解析，等到该脚本下载、执行完毕后再继续解析之后的dom（现代浏览器做了preload优化，会预先下载好多个脚本，但执行顺序与它们在dom中顺序一致，执行时阻塞其他dom解析）</p>
+<p>动态插入script，<strong>var a = document.createElement(‘script’); a.src=’xxx’; document.body.appendChild(a)</strong>;浏览器会在该脚本下载完成后执行，过程是异步的。</p>
+<p>下载完成后执行上述的操作，解析依赖-&gt;加载依赖-&gt;解析本模块-&gt;加载完成-&gt;执行回调。</p>
+<p>模块下载完成后，如何在解析它时知道它的uri呢？有两种发发，一种是用 <strong>srcipt.onload</strong> 获取 <strong>this</strong> 对象的src属性；一种是在define函数中采用 <strong>document.currentScript.src</strong>。</p>
+<p>实现基本的功能比较简单，代码不到200行：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> zmm = &#123;</div><div class="line">    <span class="attr">_modules</span>: &#123;&#125;,</div><div class="line">    <span class="attr">_configs</span>: &#123;</div><div class="line">        <span class="comment">// 用于拼接相对路径</span></div><div class="line">        basePath: (<span class="function"><span class="keyword">function</span> (<span class="params">path</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (path.charAt(path.length - <span class="number">1</span>) === <span class="string">'/'</span>) &#123;</div><div class="line">                path = path.substr(<span class="number">0</span>, path.length - <span class="number">1</span>);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> path.substr(path.indexOf(location.host) + location.host.length + <span class="number">1</span>);</div><div class="line">        &#125;)(location.href),</div><div class="line">        <span class="comment">// 用于拼接相对根路径</span></div><div class="line">        host: location.protocol + <span class="string">'//'</span> + location.host + <span class="string">'/'</span></div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.hasModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断是否已有该模块，不论加载中或已加载好</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>._modules.hasOwnProperty(_uri);</div><div class="line">&#125;;</div><div class="line">zmm.isModuleLoaded = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断该模块是否已加载好</span></div><div class="line">    <span class="keyword">return</span> !!<span class="keyword">this</span>._modules[_uri];</div><div class="line">&#125;;</div><div class="line">zmm.pushModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 新模块占坑，但此时还未加载完成，表示加载中；防止重复加载</span></div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>._modules.hasOwnProperty(_uri)) &#123;</div><div class="line">        <span class="keyword">this</span>._modules[_uri] = <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">zmm.installModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri, mod</span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>._modules[_uri] = mod;</div><div class="line">&#125;;</div><div class="line">zmm.load = <span class="function"><span class="keyword">function</span> (<span class="params">uris</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i, nsc;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; uris.length; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.hasModule(uris[i])) &#123;</div><div class="line">            <span class="keyword">this</span>.pushModule(uris[i]);</div><div class="line">            <span class="comment">// 开始加载</span></div><div class="line">            <span class="keyword">var</span> nsc = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>);</div><div class="line">                nsc.src = uri;</div><div class="line">            <span class="built_in">document</span>.body.appendChild(nsc);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.resolvePath = <span class="function"><span class="keyword">function</span> (<span class="params">path</span>) </span>&#123;</div><div class="line">    <span class="comment">// 返回绝对路径</span></div><div class="line">    <span class="keyword">var</span> res = <span class="string">''</span>, paths = [], resPaths;</div><div class="line">    <span class="keyword">if</span> (path.match(<span class="regexp">/.*:\/\/.*/</span>)) &#123;</div><div class="line">        <span class="comment">// 绝对路径</span></div><div class="line">        res = path.match(<span class="regexp">/.*:\/\/.*?\//</span>)[<span class="number">0</span>]; <span class="comment">// 协议+域名</span></div><div class="line">        path = path.substr(res.length);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (path.charAt(<span class="number">0</span>) === <span class="string">'/'</span>) &#123;</div><div class="line">        <span class="comment">// 相对根路径 /开头</span></div><div class="line">        res = <span class="keyword">this</span>._configs.host;</div><div class="line">        path = path.substr(<span class="number">1</span>);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 相对路径 ./或../开头或直接文件名</span></div><div class="line">        res = <span class="keyword">this</span>._configs.host;</div><div class="line">        resPaths = <span class="keyword">this</span>._configs.basePath.split(<span class="string">'/'</span>);</div><div class="line">    &#125;</div><div class="line">    resPaths = resPaths || [];</div><div class="line">    paths = path.split(<span class="string">'/'</span>);</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; paths.length; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (paths[i] === <span class="string">'..'</span>) &#123;</div><div class="line">            resPaths.pop();</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (paths[i] === <span class="string">'.'</span>) &#123;</div><div class="line">            <span class="comment">// do nothing</span></div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            resPaths.push(paths[i]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    res += resPaths.join(<span class="string">'/'</span>);</div><div class="line">    <span class="keyword">return</span> res;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> define = zmm.define = <span class="function"><span class="keyword">function</span> (<span class="params">dependPaths, fac</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> _uri = <span class="built_in">document</span>.currentScript.src;</div><div class="line">    <span class="keyword">if</span> (zmm.isModuleLoaded(_uri)) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">var</span> factory, depPaths, uris = [];</div><div class="line">    <span class="keyword">if</span> (<span class="built_in">arguments</span>.length === <span class="number">1</span>) &#123;</div><div class="line">        factory = <span class="built_in">arguments</span>[<span class="number">0</span>];</div><div class="line">        <span class="comment">// 挂载到模块组中</span></div><div class="line">        zmm.installModule(_uri, factory());</div><div class="line">        <span class="comment">// 告诉proxy该模块已装载好</span></div><div class="line">        zmm.proxy.emit(_uri);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 有依赖的情况</span></div><div class="line">        factory = <span class="built_in">arguments</span>[<span class="number">1</span>];</div><div class="line">        <span class="comment">// 装载完成的回调函数</span></div><div class="line">        zmm.use(<span class="built_in">arguments</span>[<span class="number">0</span>], <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">            zmm.installModule(_uri, factory.apply(<span class="literal">null</span>, <span class="built_in">arguments</span>));</div><div class="line">            zmm.proxy.emit(_uri);</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.use = <span class="function"><span class="keyword">function</span> (<span class="params">paths, callback</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(paths)) &#123;</div><div class="line">        paths = [paths];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">var</span> uris = [], i;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; paths.length; i++) &#123;</div><div class="line">        uris.push(<span class="keyword">this</span>.resolvePath(paths[i]));</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 先注册事件，再加载</span></div><div class="line">    <span class="keyword">this</span>.proxy.watch(uris, callback);</div><div class="line">    <span class="keyword">this</span>.load(uris);</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.proxy = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> proxy = &#123;&#125;;</div><div class="line">    <span class="keyword">var</span> taskId = <span class="number">0</span>;</div><div class="line">    <span class="keyword">var</span> taskList = &#123;&#125;;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> execute = <span class="function"><span class="keyword">function</span> (<span class="params">task</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> uris = task.uris,</div><div class="line">            callback = task.callback;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, arr = []; i &lt; uris.length; i++) &#123;</div><div class="line">            arr.push(zmm._modules[uris[i]]);</div><div class="line">        &#125;</div><div class="line">        callback.apply(<span class="literal">null</span>, arr);</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">var</span> deal_loaded = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> i, k, task, sum;</div><div class="line">        <span class="comment">// 当一个模块加载完成时，遍历当前任务栈</span></div><div class="line">        <span class="keyword">for</span> (k <span class="keyword">in</span> taskList) &#123;</div><div class="line">            <span class="keyword">if</span> (!taskList.hasOwnProperty(k)) &#123;</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            &#125;</div><div class="line">            task = taskList[k];</div><div class="line">            <span class="keyword">if</span> (task.uris.indexOf(_uri) &gt; <span class="number">-1</span>) &#123;</div><div class="line">                <span class="comment">// 查看这个任务中的模块是否都已加载好</span></div><div class="line">                <span class="keyword">for</span> (i = <span class="number">0</span>, sum = <span class="number">0</span>; i &lt; task.uris.length; i++) &#123;</div><div class="line">                    <span class="keyword">if</span> (zmm.isModuleLoaded(task.uris[i])) &#123;</div><div class="line">                        sum ++;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">if</span> (sum === task.uris.length) &#123;</div><div class="line">                    <span class="comment">// 都加载完成 删除任务</span></div><div class="line">                    <span class="keyword">delete</span>(taskList[k]);</div><div class="line">                    execute(task);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    proxy.watch = <span class="function"><span class="keyword">function</span> (<span class="params">uris, callback</span>) </span>&#123;</div><div class="line">        <span class="comment">// 先检查一遍是否都加载好了</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, sum = <span class="number">0</span>; i &lt; uris.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (zmm.isModuleLoaded(uris[i])) &#123;</div><div class="line">                sum ++;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (sum === uris.length) &#123;</div><div class="line">            execute(&#123;</div><div class="line">                <span class="attr">uris</span>: uris,</div><div class="line">                <span class="attr">callback</span>: callback</div><div class="line">            &#125;);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 订阅新加载任务</span></div><div class="line">            <span class="keyword">var</span> task = &#123;</div><div class="line">                <span class="attr">uris</span>: uris,</div><div class="line">                <span class="attr">callback</span>: callback</div><div class="line">            &#125;;</div><div class="line">            taskList[<span class="string">''</span> + taskId] = task;</div><div class="line">            taskId ++;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    proxy.emit = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(_uri + <span class="string">' is loaded!'</span>);</div><div class="line">        deal_loaded(_uri);</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> proxy;</div><div class="line">&#125;();</div></pre></td></tr></table></figure></p>
+<h2 id="循环依赖问题"><a href="#循环依赖问题" class="headerlink" title="循环依赖问题"></a>循环依赖问题</h2><p>“循环加载”指的是，a脚本的执行依赖b脚本，而b脚本的执行又依赖a脚本。这是一种应该尽量避免的设计。</p>
+<h3 id="浏览器端"><a href="#浏览器端" class="headerlink" title="浏览器端"></a>浏览器端</h3><p>用上面的zmm工具加载模块a:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// main.html</span></div><div class="line">zmm.use(<span class="string">'/a.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;...&#125;);</div><div class="line"><span class="comment">// a.js</span></div><div class="line">define(<span class="string">'/b.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">b</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line">  a = b + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> a;</div><div class="line">&#125;);</div><div class="line"><span class="comment">// b.js</span></div><div class="line">define(<span class="string">'/a.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> b;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>就会陷入a等待b加载完成、b等待a加载完成的死锁状态。sea.js碰到这种情况也是死锁，也许是默认这种行为不应该出现。<br>seajs里可以通过require.async来缓解循环依赖的问题，但必须改写a.js：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line">define(<span class="string">'./js/a'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">require, exports, module</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line">  <span class="built_in">require</span>.async(<span class="string">'./b'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">b</span>) </span>&#123;</div><div class="line">      a = b + <span class="number">1</span>;</div><div class="line">      <span class="built_in">module</span>.exports = a; <span class="comment">//a= 3</span></div><div class="line">  &#125;);</div><div class="line">  <span class="built_in">module</span>.exports = a; <span class="comment">// a= 1</span></div><div class="line">&#125;);</div><div class="line"><span class="comment">// b.js</span></div><div class="line">define(<span class="string">'./js/b'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">require, exports, module</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line">  <span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line">  <span class="built_in">module</span>.exports = b;</div><div class="line">&#125;);</div><div class="line"><span class="comment">// main.html</span></div><div class="line">seajs.use(<span class="string">'./js/a'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(a);  <span class="comment">// 1</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
+<p>但这么做a就必须先知道b会依赖自己，且use中输出的是b还没加载时a的值，use并不知道a的值之后还会改变。<br>在浏览器端，似乎没有很好的解决方案。node模块加载碰到的循环依赖问题则小得多。</p>
+<h3 id="node-CommonJS"><a href="#node-CommonJS" class="headerlink" title="node/CommonJS"></a>node/CommonJS</h3><p>CommonJS模块的重要特性是加载时执行，即脚本代码在require的时候，就会全部执行。CommonJS的做法是，一旦出现某个模块被”循环加载”，就只输出已经执行的部分，还未执行的部分不会输出。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = a;</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">require</span>(<span class="string">'./b'</span>);</div><div class="line">a = b + <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = a;</div><div class="line"><span class="comment">// b.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line"><span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = b;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line"><span class="built_in">console</span>.log(a); <span class="comment">//3</span></div></pre></td></tr></table></figure></p>
+<p>上面main.js的代码中，先加载模块a，执行require函数，此时内存中已经挂了一个模块a，它的exports为一个空对象a.exports={}；接着执行a.js中的代码；执行var b = require(‘./b’);之前，a.exports=1，接着执行require(b)；b.js被执行时，拿到的是a.exports=1，b加载完成后，执行权回到a.js；最后a模块的输出为3。</p>
+<p>CommonJS与浏览器端的加载器有着实现上的差异。node加载的模块都是在本地，执行的是同步的加载过程，即按依赖关系依次加载，执行到加载语句就去加载另一个模块，加载完了再回到函数调用点继续执行；浏览器端加载scripts由于天生限制，只能采取异步加载，执行回调来实现。</p>
+<h3 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h3><p>ES6模块的运行机制与CommonJS不一样，它遇到模块加载命令import时，不会去执行模块，而是只生成一个引用。等到真的需要用到时，再到模块里面去取值。因此，ES6模块是动态引用，不存在缓存值的问题，而且模块里面的变量，绑定其所在的模块。</p>
+<p>这导致ES6处理”循环加载”与CommonJS有本质的不同。ES6根本不会关心是否发生了”循环加载”，只是生成一个指向被加载模块的引用，需要开发者自己保证，真正取值的时候能够取到值。</p>
+<p>来看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// even.js</span></div><div class="line"><span class="keyword">import</span> &#123; odd &#125; <span class="keyword">from</span> <span class="string">'./odd'</span>;</div><div class="line"><span class="keyword">export</span> <span class="keyword">var</span> counter = <span class="number">0</span>;</div><div class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">even</span>(<span class="params">n</span>) </span>&#123; counter++; <span class="keyword">return</span> n == <span class="number">0</span> || odd(n - <span class="number">1</span>);&#125;</div><div class="line"><span class="comment">// odd.js</span></div><div class="line"><span class="keyword">import</span> &#123; even &#125; <span class="keyword">from</span> <span class="string">'./even'</span>;</div><div class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">odd</span>(<span class="params">n</span>) </span>&#123; <span class="keyword">return</span> n != <span class="number">0</span> &amp;&amp; even(n - <span class="number">1</span>);&#125;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">import</span> * <span class="keyword">as</span> m <span class="keyword">from</span> <span class="string">'./even.js'</span>;</div><div class="line">m.even(<span class="number">10</span>); <span class="comment">// true; m.counter = 6</span></div></pre></td></tr></table></figure></p>
+<p>上面代码中，even.js里面的函数even有一个参数n，只要不等于0，就会减去1，传入加载的odd()。odd.js也会做类似作。</p>
+<p>上面代码中，参数n从10变为0的过程中，foo()一共会执行6次，所以变量counter等于6。第二次调用even（）时，参数n从20变为0，foo()一共会执行11次，加上前面的6次，所以变量counter等于17。</p>
+<p>而这个例子要是改写成CommonJS，就根本无法执行，会报错。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// even.js</span></div><div class="line"><span class="keyword">var</span> odd = <span class="built_in">require</span>(<span class="string">'./odd'</span>);</div><div class="line"><span class="keyword">var</span> counter = <span class="number">0</span>;</div><div class="line">exports.counter = counter;</div><div class="line">exports.even = <span class="function"><span class="keyword">function</span>(<span class="params">n</span>) </span>&#123;</div><div class="line">counter++;</div><div class="line"><span class="keyword">return</span> n == <span class="number">0</span> || odd(n - <span class="number">1</span>);</div><div class="line">&#125;</div><div class="line"><span class="comment">// odd.js</span></div><div class="line"><span class="keyword">var</span> even = <span class="built_in">require</span>(<span class="string">'./even'</span>).even;</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">n</span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> n != <span class="number">0</span> &amp;&amp; even(n - <span class="number">1</span>);</div><div class="line">&#125;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">var</span> m = <span class="built_in">require</span>(<span class="string">'./even'</span>);</div><div class="line">m.even(<span class="number">10</span>); <span class="comment">// TypeError: even is not a function</span></div></pre></td></tr></table></figure></p>
+<p>上面代码中，even.js加载odd.js，而odd.js又去加载even.js，形成”循环加载”。这时，执行引擎就会输出even.js已经执行的部分（不存在任何结果），所以在odd.js之中，变量even等于null，等到后面调用even(n-1)就会报错。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/02/JavaScript面向对象系列：六、对象模式/" rel="next" title="JavaScript面向对象系列：六、对象模式">
+                <i class="fa fa-chevron-left"></i> JavaScript面向对象系列：六、对象模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/07/09/react为什么需要key/" rel="prev" title="react为什么需要key">
+                react为什么需要key <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="赖宝" />
+          <p class="site-author-name" itemprop="name">赖宝</p>
+           
+              <p class="site-description motion-element" itemprop="description">努力学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器端js加载器"><span class="nav-number">1.</span> <span class="nav-text">浏览器端js加载器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#循环依赖问题"><span class="nav-number"></span> <span class="nav-text">循环依赖问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#浏览器端"><span class="nav-number">1.</span> <span class="nav-text">浏览器端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#node-CommonJS"><span class="nav-number">2.</span> <span class="nav-text">node/CommonJS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ES6"><span class="nav-number">3.</span> <span class="nav-text">ES6</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">赖宝</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

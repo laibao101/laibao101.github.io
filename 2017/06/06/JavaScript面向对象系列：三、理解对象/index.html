@@ -1,0 +1,709 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]]">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript面向对象系列：三、理解对象构造函数和原型对象">
+<meta property="og:url" content="http://blog.webtoatl.cn/2017/06/06/JavaScript面向对象系列：三、理解对象/index.html">
+<meta property="og:site_name" content="赖宝的宝">
+<meta property="og:description" content="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]]">
+<meta property="og:updated_time" content="2017-07-05T14:10:19.624Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript面向对象系列：三、理解对象构造函数和原型对象">
+<meta name="twitter:description" content="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]]">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.webtoatl.cn/2017/06/06/JavaScript面向对象系列：三、理解对象/"/>
+
+
+
+
+
+  <title> JavaScript面向对象系列：三、理解对象构造函数和原型对象 | 赖宝的宝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">赖宝的宝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">前端技能分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/06/06/JavaScript面向对象系列：三、理解对象/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JavaScript面向对象系列：三、理解对象构造函数和原型对象
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T00:00:00+08:00">
+                2017-06-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。"><a href="#js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。" class="headerlink" title="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。"></a>js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。</h2><h2 id="当一个属性第一次被添加给对象时，js在对象上调用一个名为-Put-的内部方法。-Put-方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用-Put-的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。"><a href="#当一个属性第一次被添加给对象时，js在对象上调用一个名为-Put-的内部方法。-Put-方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用-Put-的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。" class="headerlink" title="当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]] 的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。"></a>当一个属性第一次被添加给对象时，js在对象上调用一个名为 <strong><em>[[Put]]</em></strong> 的内部方法。 <strong><em>[[Put]]</em></strong> 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 <strong><em>[[Put]]</em></strong> 的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。</h2><h2 id="当一个已有的属性被赋予一个新值的时候，调用一个名为-Set-的方法。该方法将属性的当前方法替换为新值。"><a href="#当一个已有的属性被赋予一个新值的时候，调用一个名为-Set-的方法。该方法将属性的当前方法替换为新值。" class="headerlink" title="当一个已有的属性被赋予一个新值的时候，调用一个名为 [[Set]] 的方法。该方法将属性的当前方法替换为新值。"></a>当一个已有的属性被赋予一个新值的时候，调用一个名为 <strong><em>[[Set]]</em></strong> 的方法。该方法将属性的当前方法替换为新值。</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span> <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">&#125;;</div><div class="line">person.age = <span class="number">25</span>; <span class="comment">//调用 [[Put]] 方法</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>; <span class="comment">//调用 [[Set]] 方法</span></div></pre></td></tr></table></figure>
+<h2 id="属性探测"><a href="#属性探测" class="headerlink" title="属性探测"></a>属性探测</h2><p>不要使用一下模式探测属性是否存在<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(person.age)&#123;</div><div class="line">    <span class="comment">//todo</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>因为当person.age 为一个对象、非空字符串、非零数字、true时，会判断为真。当person为 null、undefined、0、false、NaN或空字符串会判断为假。</p>
+<p>更可靠的属性探测方式是使用 <strong><em>in</em></strong> 操作符。</p>
+<p>例如<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sex"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div></pre></td></tr></table></figure></p>
+<p>使用 <strong><em>in</em></strong> 操作符，在大多数情况下是属性探测的最好的办法。它还有一个额外的好处是不会评估属性的值。当此类评估会导致性能问题或者错误时，这一点很重要。</p>
+<h2 id="在某些情况下，希望检查一个属性是不是自有属性。"><a href="#在某些情况下，希望检查一个属性是不是自有属性。" class="headerlink" title="在某些情况下，希望检查一个属性是不是自有属性。"></a>在某些情况下，希望检查一个属性是不是自有属性。</h2><p><strong><em>in</em></strong> 操作符会检查自有属性和原型属性，所以不能检查出正确结果。</p>
+<p>另一个方法是 hasOwnProperty方法，这个方法只有在属性存在并且是自有属性时才返回true。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span> <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.hasOwnProperty(<span class="string">"name"</span>)); <span class="comment">//true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"toString"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.hasOwnProperty(<span class="string">"toString"</span>)); <span class="comment">//false</span></div></pre></td></tr></table></figure>
+<p>##删除对象属性</p>
+<p>使用 <strong><em>delete</em></strong> 操作符可以将属性从一个对象中删除。将对象的一个属性设置为null并不能将属性从对象中彻底删除，这种做法只会将原值替换为null。</p>
+<p>使用 <strong><em>delete</em></strong> 操作符会调用对象内部名为 <strong><em>[[Delete]]</em></strong> 的内部方法。相当于从哈希表中移除了一个键值对。</p>
+<h2 id="属性枚举"><a href="#属性枚举" class="headerlink" title="属性枚举"></a>属性枚举</h2><p>对象内部属性 <strong><em>[[Enumerable]]</em></strong> 设置为true，则属性可以循环遍历。可以使用 <strong><em>for-in</em></strong> 操作符来遍历一个对象。es5中新增 <strong><em>Object.keys()</em></strong> 来遍历对象的键，返回一个键组成的数组。</p>
+<p>这两种操作符循环遍历有区别， <strong><em>for-in</em></strong> 操作符会遍历自有属性和原型属性，<strong><em>Object.keys()</em></strong> 只会遍历自由属性。</p>
+<p>并不是所有属性都是可枚举的，实际上，对象大部分原生方法的 <strong><em>[[Enumerable]]</em></strong> 设置为false,可以使用 <strong><em>propertyIsEnumerable()</em></strong> 方法来检查一个属性是否为可枚举，每个对象都有这个方法。</p>
+<h2 id="访问器属性"><a href="#访问器属性" class="headerlink" title="访问器属性"></a>访问器属性</h2><p><strong><em>get</em></strong> 和 <strong><em>set</em></strong> 属性时访问器属性，可以定义属性被读取或者写入时候的行为。这两个属性可以只设置其中一个，如果只设置 <strong><em>get</em></strong> 这个属性变为只读，如果只设置 <strong><em>set</em></strong> 这个属性变为只写，这两种情况在严格模式下会报错.</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span>, <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">    set name(value)&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'set'</span>);</div><div class="line">        <span class="keyword">this</span>.name = value;</div><div class="line">    &#125;,</div><div class="line">    get name()&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'get'</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.name;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">person.name; <span class="comment">//get</span></div><div class="line">person.name = <span class="string">'xiaowang'</span>; <span class="comment">//set</span></div></pre></td></tr></table></figure>
+<p>##通用特征</p>
+<p>有两个属性是数据和访问器都具有的。一个是 <strong><em>[[Enumerable]]</em></strong> ，决定了你是否可以遍历该属性。另一个是<br><strong><em>[[Configurable]]</em></strong> ,决定了该属性是否可配置.可以随时删除或改变一个可配置属性。改变属性特征，可以使用 <strong><em>Object.defineProperty()</em></strong> 方法。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span>,</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">enumerable</span>:<span class="literal">false</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.propertyIsEnumerable(<span class="string">"name"</span>)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> propertites = <span class="built_in">Object</span>.keys(person);</div><div class="line"><span class="built_in">console</span>.log(propertites.length); <span class="comment">//0</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">configurable</span>:<span class="literal">false</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">configurable</span>:<span class="literal">true</span></div><div class="line">&#125;);  <span class="comment">//报错</span></div></pre></td></tr></table></figure>
+<p>一个属性被设置为不可配置了，就不能再修改了。<strong>无法将一个不可配置属性变成可配置属性</strong> 。删除一个不可配置属性，非严格模式下会失败，严格模式下会报错。</p>
+<h2 id="数据属性特征"><a href="#数据属性特征" class="headerlink" title="数据属性特征"></a>数据属性特征</h2><p>数据属性拥有两个访问器属性不具备的特征：</p>
+<p>第一个是 <strong><em>[[Value]]</em></strong> ,包含属性的值，在对象上创建属性时该特征被自动赋值。所有的属性的值都保存在 <strong><em>[[Value]]</em></strong> 中，即使值是一个函数。</p>
+<p>第二个是 <strong><em>[[Writable]]</em></strong> ,该特种是一个布尔值，只是该属性是否可以写入，所有的属性默认是可写的。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">value</span>:<span class="string">"laowang"</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.propertyIsEnumerable(<span class="string">"name"</span>)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div></pre></td></tr></table></figure>
+<p>使用 <strong><em>Object.defineProperty()</em></strong> 定义新的属性时，一定要为所有特征指定一个值，否则布尔值类型的特征会被默认设置为false。上面这个name就是不可枚举，不可配置，不可写。</p>
+<h2 id="定义多重属性"><a href="#定义多重属性" class="headerlink" title="定义多重属性"></a>定义多重属性</h2><p>使用 <strong><em>Object.defineProperty()</em></strong> 可以定义一个属性的特征。使用 <strong><em>Object.defineProperties()</em></strong> 可以定义多个属性的特征。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperties(person,&#123;</div><div class="line">    <span class="attr">name</span>:&#123;</div><div class="line">        <span class="attr">value</span>:<span class="string">"laowang"</span>,</div><div class="line">        <span class="attr">configurable</span>:<span class="literal">true</span></div><div class="line">    &#125;,</div><div class="line">    <span class="attr">age</span>:&#123;</div><div class="line">        <span class="attr">value</span>:<span class="number">25</span>,</div><div class="line">        <span class="attr">configurable</span>:<span class="literal">false</span>,</div><div class="line">        <span class="attr">enumerable</span>:<span class="literal">false</span></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<h2 id="获取属性特征"><a href="#获取属性特征" class="headerlink" title="获取属性特征"></a>获取属性特征</h2><p>使用 <strong><em>Object.getOwnPropertyDescriptor()</em></strong> 可以获取一个属性的所有特征</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.enumerable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.writable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.value); <span class="comment">//laowang</span></div></pre></td></tr></table></figure>
+<h2 id="对象禁止扩展"><a href="#对象禁止扩展" class="headerlink" title="对象禁止扩展"></a>对象禁止扩展</h2><p>对象也有内部特征，禁止扩展方法是 <strong><em>Object.preventExtensions()</em></strong> 。可以用 <strong><em>Object.isExtensible()</em></strong> 来检查对象的 <strong><em>[[Extensible]]</em></strong> 的值。</p>
+<p>例如<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.preventExtensions(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div></pre></td></tr></table></figure></p>
+<h2 id="对象封印"><a href="#对象封印" class="headerlink" title="对象封印"></a>对象封印</h2><p>对象封印时创建不可扩展对象的第二种方法。对象被封印后是不可扩展的并且所有属性都不可配置。不仅不能给对象添加新属性，也不能删除属性或改变其类型（从数据属性编程访问器属性或者相反）。一个对象被封印，则只能读写它的属性。</p>
+<p>使用 <strong><em>Object.seal()</em></strong> 方法来封印一个对象。对象的 <strong><em>[[Extensible]]</em></strong> 被设置为false。 其余所有属性的 <strong><em>[[Configurate]]</em></strong> 特征被设置为false。可以使用 <strong><em>Object.isSealed()</em></strong>  来判断一个对象是否被封印。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.seal(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//xiaowang</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//xiaowang</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.enumerable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//false</span></div></pre></td></tr></table></figure>
+<h2 id="对象冻结"><a href="#对象冻结" class="headerlink" title="对象冻结"></a>对象冻结</h2><p>创建不可扩展对象的最后一种方法是冻结对象。如果一个对象被冻结，则不能在对象上添加或者删除属性，不能改变属性类型，也不能写入任何数据属性。被冻结对象是一个数据属性都为只读的封印对象。被冻结的对象无法解冻。使用 <strong><em>Object.freeze()</em></strong> 来冻结一个对象，使用 <strong><em>Object.isFrozen()</em></strong> 来判断一个对象是否被冻结。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isFrozen(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.freeze(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isFrozen(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.writable); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//false</span></div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>属性有两种类型：数据属性、访问器属性。数据属性可以保存值，访问器属性不保存值。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/24/JavaScript面向对象系列：二、函数/" rel="next" title="JavaScript面向对象系列：二、函数">
+                <i class="fa fa-chevron-left"></i> JavaScript面向对象系列：二、函数
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/12/JavaScript面向对象系列：四、构造函数和原型对象/" rel="prev" title="JavaScript面向对象系列：四、构造函数和原型对象">
+                JavaScript面向对象系列：四、构造函数和原型对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="赖宝" />
+          <p class="site-author-name" itemprop="name">赖宝</p>
+           
+              <p class="site-description motion-element" itemprop="description">努力学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。"><span class="nav-number">1.</span> <span class="nav-text">js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#当一个属性第一次被添加给对象时，js在对象上调用一个名为-Put-的内部方法。-Put-方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用-Put-的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。"><span class="nav-number">2.</span> <span class="nav-text">当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]] 的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#当一个已有的属性被赋予一个新值的时候，调用一个名为-Set-的方法。该方法将属性的当前方法替换为新值。"><span class="nav-number">3.</span> <span class="nav-text">当一个已有的属性被赋予一个新值的时候，调用一个名为 [[Set]] 的方法。该方法将属性的当前方法替换为新值。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性探测"><span class="nav-number">4.</span> <span class="nav-text">属性探测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在某些情况下，希望检查一个属性是不是自有属性。"><span class="nav-number">5.</span> <span class="nav-text">在某些情况下，希望检查一个属性是不是自有属性。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#属性枚举"><span class="nav-number">6.</span> <span class="nav-text">属性枚举</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问器属性"><span class="nav-number">7.</span> <span class="nav-text">访问器属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据属性特征"><span class="nav-number">8.</span> <span class="nav-text">数据属性特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义多重属性"><span class="nav-number">9.</span> <span class="nav-text">定义多重属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取属性特征"><span class="nav-number">10.</span> <span class="nav-text">获取属性特征</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象禁止扩展"><span class="nav-number">11.</span> <span class="nav-text">对象禁止扩展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象封印"><span class="nav-number">12.</span> <span class="nav-text">对象封印</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象冻结"><span class="nav-number">13.</span> <span class="nav-text">对象冻结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">14.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">赖宝</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
