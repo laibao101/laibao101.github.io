@@ -250,7 +250,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/01/结合实例浅谈JS回调函数、函数传参及作用域/">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/03/JavaScript的原型及原型链/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="赖宝">
@@ -272,8 +272,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/08/01/结合实例浅谈JS回调函数、函数传参及作用域/" itemprop="url">
-                  未命名
+                <a class="post-title-link" href="/2017/08/03/JavaScript的原型及原型链/" itemprop="url">
+                  JavaScript的原型及原型链
                 </a>
               
             
@@ -289,8 +289,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-01T21:57:40+08:00">
-                2017-08-01
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-03T00:00:00+08:00">
+                2017-08-03
               </time>
             
 
@@ -327,7 +327,24 @@
       
         
           
-            
+            <p>在 javascript王国的一次旅行，一个没有类的世界怎么玩转面向对象？ 一文中我们提到了在没有类概念的 JavaScript 语言中是通过原型来实现面向对象的继承特性。只要运用得好，这种基于原型的 JavaScript 继承模型比传统的类继承还要强大。所以我们还需详细学习一下原型的知识</p>
+<h2 id="JavaScript-的对象"><a href="#JavaScript-的对象" class="headerlink" title="JavaScript 的对象"></a>JavaScript 的对象</h2><p>JavaScript 是基于对象的面向对象语言。因此在这里的“对象”既可以是普通对象（Object），也可以是函数对象（Function）。JS 抛弃了 Java 的类概念，而 Java 的继承恰恰是通过类来实现的。那么 JS 没有类的概念，就使用了“原型”的概念来实现继承。</p>
+<h3 id="字面量原型及原型链"><a href="#字面量原型及原型链" class="headerlink" title="字面量原型及原型链"></a>字面量原型及原型链</h3><p>JS 可通过字面量构造对象。为了实现继承，对象里面有个<em>proto</em>属性可以指向该对象的父对象。这个父对象就是所谓的“原型”。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> animal = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'动物'</span>,</div><div class="line">  <span class="attr">eat</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name + <span class="string">" is eating"</span>);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line">animal.eat();     <span class="comment">// animal is eating</span></div><div class="line"><span class="keyword">var</span> dog = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'狗'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line"><span class="keyword">var</span> cat = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'猫'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line">dog.eat();        <span class="comment">// 狗 is eating</span></div><div class="line">cat.eat();        <span class="comment">// 猫 is eating</span></div></pre></td></tr></table></figure>
+<p>由上面代码我们可以看出：dog 和 cat 对象的原型都是 animal。但是 dog 和 cat 对象都没有定义 eat()方法，那怎么可以调用呢？其实当eat方法被调用的时候，先在自己的方法列表中寻找， 如果找不到，就去找原型中的方法， 如果原型中找不到， 就去原型的原型中去寻找…… 最后找到Object那里， 如果还找不到， 那就是未定义了。这几个对象通过<em>proto</em>属性建立一个原型链！<br><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fhwi3i5lirj20gt0f8dif.jpg" alt="image"></p>
+<h2 id="构造函数原型及原型链"><a href="#构造函数原型及原型链" class="headerlink" title="构造函数原型及原型链"></a>构造函数原型及原型链</h2><p>但是为了迁就 C++、Java、C# 程序员，让 JavaScript 可以像 Java 那样 new （构造）出一个对象出来，于是这里做了一个变通，也提供了构造函数。例子如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">function Student(name,grade)&#123;</div><div class="line">  this.name = name;</div><div class="line">  this.grade = grade;</div><div class="line">  this.sayHello = function()&#123;</div><div class="line">    console.log('Hi,I'm ' + this.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">andy = new Student('Andy',5);</div><div class="line">lisa = new Student('Lisa',5);</div><div class="line">andy.sayHello();    //Hi,I'm Andy</div><div class="line">lisa.sayHello();    //Hi,I'm Lisa</div><div class="line">    </div><div class="line">//假设 andy 和 lisa 是同班同学，同时即将升入六年级</div><div class="line">andy.grade = 6;</div><div class="line">console.log(andy.grade);   // 6</div><div class="line">console.log(lisa.grade);   // 5</div></pre></td></tr></table></figure></p>
+<p>由上面的代码所示，我们可以看出这个所谓的构造函数已经很有 Java 类的感觉了。但是这里面存在两个问题：在对象里面定义方法，这样每创建一个对象都会一个sayHello()函数，这样来说显得对象臃肿，浪费资源；同时每个对象各自保有自己的属性和函数的副本，无法做到属性和方法共享。因此，这里有一个更加高效的办法就是把对象共享的属性和方法可以放到 Student.prototype 这个对象当中。如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name</span>)</span>&#123;</div><div class="line">  <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Student.prototype = &#123;</div><div class="line">  <span class="attr">grade</span>: <span class="number">5</span>,</div><div class="line">  <span class="attr">sayHello</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="comment">/*也可以写成</span></div><div class="line">Student.prototype.grade = 5;</div><div class="line">Student.prototype.sayHello = function()&#123;</div><div class="line">  console.log("Hi, I'm "+this.name);</div><div class="line">&#125;;</div><div class="line">*/</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"Andy"</span>);</div><div class="line"><span class="keyword">var</span> lisa = <span class="keyword">new</span> Student(<span class="string">"Lisa"</span>);</div><div class="line">andy.sayHello();      <span class="comment">//Hi, I'm Andy</span></div><div class="line">lisa.sayHello();      <span class="comment">//Hi, I'm Lisa</span></div><div class="line">Student.prototype.grade = <span class="number">6</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Andy's grade: "</span>+ andy.grade);    <span class="comment">// 6</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Lisa's grade: "</span>+ Lisa.grade);    <span class="comment">// 6</span></div></pre></td></tr></table></figure></p>
+<p><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fi6yabvn3vj20rn0ogdhf.jpg" alt="image"><br>由上面的代码和示意图可看出这个所谓的构造函数 Student 其实就是一个幌子啊， 每次去new Student的时候，确实会创建一个对象出来（ andy 或者 lisa ) ， 并且把这个对象的原型指针(<em>proto</em>)指向 Student.prototype 这个对象，这样一来就能找到sayHello()方法了。我们应该还知道上面的构造函数Student()对象（JS 中函数也是对象）会创建一个 prototype 对象（Student.prototype），而 new 出来的实例对象例如 andy 和 lisa 是没有这个 prototype 对象，但是他会有个 proto 属性（<em>proto</em>）指向这个构造函数对象的 prototype 对象，从而构成原型链。实例对象其实是通过原型对象与构造函数取得联系的。为了让 Java、C#、C++ 程序员降低学习成本，JavaScript 提供了语法糖：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(name)&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">  &#125;</div><div class="line">  sayHello()&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"andy"</span>);   </div><div class="line">andy.sayHello();                     <span class="comment">//Hi, I'm andy</span></div></pre></td></tr></table></figure></p>
+<h3 id="Object-create"><a href="#Object-create" class="headerlink" title="Object.create()"></a>Object.create()</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line"><span class="built_in">console</span>.log(a);                 <span class="comment">//&#123;&#125;</span></div><div class="line">a.name = <span class="string">'Zhiyu'</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>.create(a);</div><div class="line"><span class="built_in">console</span>.log(b);                 <span class="comment">//&#123;&#125;</span></div><div class="line"><span class="built_in">console</span>.log(b.name);            <span class="comment">//Zhiyu</span></div></pre></td></tr></table></figure>
+<p>上面我们可以看出该方法是创建一个空对象，空对象的原型是create()参数。此时创建的空对象会有个(<em>proto</em>)属性指向方法参数，这样也可以构成一个原型链。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>JS 在创建对象（不论是普通对象还是函数对象）的时候，都有一个叫做 _ _proto__ 的内置属性，用于指向创建它的函数对象的原型对象 prototype</li>
+<li>原型和原型链是 JS 实现继承的一种模型</li>
+<li>原型链是靠 proto 形成的，而不是 prototype</li>
+<li>所有的原型对象都有 constructor 属性，该属性对应创建所有指向该原型的实例构造函数</li>
+<li>函数对象和原型对象通过 prototype 和 constructor 属性进行相互关联</li>
+</ol>
+
           
         
       
@@ -370,7 +387,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/30/Master Promise/">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/02/一个故事讲完 Https/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="赖宝">
@@ -392,7 +409,180 @@
             
               
                 
-                <a class="post-title-link" href="/2017/07/30/Master Promise/" itemprop="url">
+                <a class="post-title-link" href="/2017/08/02/一个故事讲完 Https/" itemprop="url">
+                  一个故事讲完 Https
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-02T00:00:00+08:00">
+                2017-08-02
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>想起上个月面试官问我了不了解 Https，当时对 HTTP 都不太熟的我只能说”No”。当我看完计算机网络教材的时候，又恰巧看见了微信公众号码农翻身的此篇推送，让我受益良多。</p>
+<h2 id="序言"><a href="#序言" class="headerlink" title="序言"></a>序言</h2><p>今天来聊一聊https 安全传输的原理。</p>
+<p>在开始之前，我们来虚构两个人物， 一个是位于中国的张大胖（怎么又是你？！）， 还有一个是位于米国的Bill (怎么还是你？！)。</p>
+<p>这俩哥们隔着千山万水，通过网络联系上了， 两个人臭味相投，聊得火热。</p>
+<p>此时正值米国大选， 张大胖亲切地“致电”Bill, 对米国总统大选的情况表示强烈地关注。 Bill则回电说谢谢关心米国人的事情我们米国人自己做主，不用你们歪果仁瞎操心……</p>
+<p>张大胖继续“致电”说其实我们支持特朗普， 因为希拉里太情绪化，太难打交道了， 我们挺希望看到特朗普上台这样米国就会变成 The Divided State of America ……</p>
+<p>Bill 回电： 拉倒你吧你， 我们米国的政体有着强大的纠错性， 虽然有时候发展得慢， 有时候会走上岔路， 但很快就会回到正途，几百年来稳定得很，不像你们像坐了过山车一样…..</p>
+<p>两个人越聊越投机，天南地北，海阔天空，还夹杂着不少隐私的话题。</p>
+<h2 id="总是有一种被偷看的感觉"><a href="#总是有一种被偷看的感觉" class="headerlink" title="总是有一种被偷看的感觉"></a>总是有一种被偷看的感觉</h2><p>有一天， Bill 突然意识到： 坏了， 我们的通信是明文的， 这简直就是网络上裸奔啊， 任何一个不怀好意的家伙都可以监听我们通信，打开我们发送的数据包，窥探我们的隐私啊。</p>
+<p>张大胖说： “你不早点说，我刚才是不是把我的微信号给你发过去了？ 我是不是告诉你我上周去哪儿旅游了? 估计已经被人截取了吧！”</p>
+<p>Bill 提议： “要不我们做个数据的加密？ 每次传输之前， 你把消息用一个加密算法加密， 然后发到我这里以后我再解密， 这样别人就无法偷窥了，像这样： ”<br><img src="http://i1.buimg.com/1949/ade6db4481ac227a.png" alt="image"><br>张大胖冰雪聪明，一看就明白了， 这加密和解密算法是公开的，那个密钥是保密的， 只有两人才知道， 这样生成的加密消息（密文） 别人就无法得知了。 他说： “Bill 老兄，你生成一个密钥， 然后把密钥发给我， 咱们这就开启加密消息， 让那些偷窥狂人们哭去吧！”</p>
+<p>（码农翻身注：这叫对称加密算法， 因为加密和解密用的是同一个密钥）</p>
+<p>一炷香功夫过去了， Bill 还是没有回音， 张大胖忍不住地催促： “快发啊？！！！”</p>
+<p>Bill 终于回复了： “ 我感觉有一双眼睛正在虎视眈眈地盯着我们的通话， 如果我把密钥发给你， 也被他截取了， 那加密岂不白费工夫？”</p>
+<p>张大胖沉默了， 是啊， 网络是不安全的， 这密钥怎么安全地发过来啊 ？　</p>
+<p>“奥，对了，我下周要去米国旅游，到时候我们见一面，把密码确定下来，写到纸上，谁也偷不走， 这不就结了？”　</p>
+<p>“哈哈， 这倒是终极解决之道 ” Bill 笑了， “不过，我不仅仅和你聊天， 我还要和易卜拉欣，阿卜杜拉， 弗拉基米尔，克里斯托夫，玛格丽特， 桥本龙太郎， 李贤俊， 许木木，郭芙蓉，吕秀才等人通信， 我总不能打着飞的，满世界的和人交换密码吧？ ”</p>
+<p>张大胖心里暗自佩服Bill同学的好友竟然遍布全球，看来他对加密通信的要求更加强烈啊！</p>
+<p>可是这个加密解密算法需要的密钥双方必须得知道啊， 但是密钥又无法通过网络发送， 这该死的偷窥者！</p>
+<h2 id="RSA：非对称加密"><a href="#RSA：非对称加密" class="headerlink" title="RSA：非对称加密"></a>RSA：非对称加密</h2><p>Bill 和 张大胖的通信无法加密，说话谨慎了不少， 直到有一天， 他们听说了一个叫做RSA的非对称加密算法，一下子来了灵感。</p>
+<p>这个RSA算法非常有意思，它不是像之前的算法， 双方必须协商一个保密的密钥， 而是有一对儿钥匙， 一个是保密的，称为私钥，另外一个是公开的，称为公钥。</p>
+<p>更有意思的是，用私钥加密的数据，只有对应的公钥才能解密，用公钥加密的数据， 只有对应的私钥才能解密。<br><img src="http://i1.buimg.com/1949/5e8c39e7ca86956d.png" alt="image"><br>有了这两个漂亮的特性， 当张大胖给Bill发消息的时候， 就可以先用Bill的公钥去加密（反正Bill的公钥是公开的，地球人都知道）， 等到消息被Bill 收到后， 他就可以用自己的私钥去解密（只有Bill才能解开，私钥是保密的 ）<br><img src="http://i1.buimg.com/1949/43e126b0647a1475.png" alt="image"><br>反过来也是如此， 当Bill 想给张大胖发消息的时候，就用张大胖的公钥加密， 张大胖收到后，就用自己的私钥解密。</p>
+<p>这样以来，通信安全固若金汤， 没有任何人能窥探他们的小秘密了。</p>
+<h2 id="非对称加密-对称加密"><a href="#非对称加密-对称加密" class="headerlink" title="非对称加密+对称加密"></a>非对称加密+对称加密</h2><p>两人实验了几次， 张大胖说： “Bill , 你有没有感觉这个RSA的加密和解密有点慢啊？”</p>
+<p>Bill叹了口气 ：“是啊， 我也注意到了， 刚才搜了一下，这个RSA算法比之前的对称密钥算法要慢上百倍。我们就是加个密而已，现在搞得都没法用了”</p>
+<p>“回到咱们最初的问题，我们想用一个密钥来加密通信，那个对称加密算法是非常快的，但是苦于密钥无法安全传输， 现在有了RSA ,我想可以结合一下， 分两步走　(1) 我生成一个对称加密算法的密钥， 用RSA的方式安全发给你， (2) 我们随后就不用RSA了， 只用这个密钥，利用对称加密算法来通信, 如何？ ”</p>
+<p>Bill 说： “你小子可以啊， 这样以来既解决了密钥的传递问题， 又解决了RSA速度慢的问题，不错。”　</p>
+<p>于是两人就安全地传递了对称加密的密钥， 用它来加密解密，果然快多了！</p>
+<h2 id="中间人攻击"><a href="#中间人攻击" class="headerlink" title="中间人攻击"></a>中间人攻击</h2><p>张大胖把和Bill 聊天的情况给老婆汇报了一次。</p>
+<p>老婆告诫他说： “你要小心啊， 你确定网络那边坐着的确实是Bill ?”</p>
+<p>张大胖着急地辩解说：“肯定是他啊，我都有他的公钥，我们俩的通信都是加密的。”</p>
+<p>老婆提醒道：＂假如啊，Bill给你发公钥的时候， 有个中间人，截取了Bill的公钥， 然后把自己的公钥发给了你，冒充Bill ，你发的消息就用中间人的公钥加了密，　那中间人不就可以解密看到消息了？＂</p>
+<p>张大胖背后出汗了，是啊，这个中间人解密以后，还可以用Bill的公钥加密，发给Bill , Bill和我根本都意识不到， 还以为我们在安全传输呢！</p>
+<p><img src="http://i1.buimg.com/1949/a58bf0d069be1226.png" alt="image"></p>
+<p>看来问题出现在公钥的分发上！ 虽然这个东西是公开的， 但是在别有用心的人看来，截取以后还可以干坏事 ！</p>
+<h2 id="你到底是谁"><a href="#你到底是谁" class="headerlink" title="你到底是谁"></a>你到底是谁</h2><p>但是怎么安全地分发公钥呢？ 似乎又回到了最初的问题： 怎么安全的保护密钥？</p>
+<p>可是似乎和最初的问题还不一样，这一次的公钥不用保密，但是一定得有个办法声明这个公钥确实是Bill的， 而不是别人的。</p>
+<p>怎么声明呢？</p>
+<p>张大胖突然想到： 现实中有公证处，它提供的公证材料大家都信任，那在网络世界也可以建立一个这样的具备公信力的认证中心， 这个中心给大家颁发一个证书， 用于证明一个人的身份。</p>
+<p>这个证书里除了包含一个人的基本信息之外，还有包括最关键的一环：这个人的公钥！</p>
+<p>这样以来我拿到证书就可以安全地取到公钥了 ！ 完美！</p>
+<p>可是Bill 马上泼了一盆冷水：证书怎么安全传输？ 要是证书传递的过程中被篡改了怎么办？</p>
+<p>张大胖心里不由地咒骂起来： 我操， 这简直就是鸡生蛋，蛋生鸡的问题啊。</p>
+<p>天无绝人之路， 张大胖很快就找到了突破口： 数字签名。</p>
+<p>简单来讲是这样的， Bill可以把他的公钥和个人信息用一个Hash算法生成一个消息摘要， 这个Hash算法有个极好的特性，只要输入数据有一点点变化，那生成的消息摘要就会有巨变，这样就可以防止别人修改原始内容。<br><img src="http://i1.buimg.com/1949/b1bb655d23b8c5cc.png" alt="image"><br>可是作为攻击者的中间人笑了： “虽然我没办法改公钥，但是我可以把整个原始信息都替换了， 生成一个新的消息摘要， 你不还是辨别不出来？”</p>
+<p>张大胖说你别得意的太早 ， 我们会让有公信力的认证中心（简称CA）用它的私钥对消息摘要加密，形成签名：<br><img src="http://i1.buimg.com/1949/38d3543e8ee28c6e.png" alt="image"><br>这还不算， 还把原始信息和数据签名合并， 形成一个全新的东西，叫做“数字证书”<br><img src="http://i1.buimg.com/1949/e7a1c438c1108a01.png" alt="image"><br>张大胖接着说：当Bill把他的证书发给我的时候， 我就用同样的Hash 算法， 再次生成消息摘要，然后用CA的公钥对数字签名解密， 得到CA创建的消息摘要， 两者一比，就知道有没有人篡改了！</p>
+<p>如果没人篡改， 我就可以安全的拿到Bill的公钥喽，有了公钥， 后序的加密工作就可以开始了。</p>
+<p>虽然很费劲， 但是为了防范你们这些偷窥者，实在是没办法啊。<br><img src="http://i1.buimg.com/1949/495b3241682bbe98.png" alt="image"><br>中间人恶狠狠地说： “算你小子狠！ 等着吧，我还有别的招。 对了，我且问你， 你这个CA的公钥怎么拿到？　难道不怕我在你传输ＣＡ公钥的时候发起中间人攻击吗？　如果我成功的伪装成了ＣＡ，你这一套体系彻底玩完。”</p>
+<p>张大胖语塞了，折腾了半天，又回到了公钥安全传输的问题！</p>
+<p>不过转念一想，想解决鸡生蛋，蛋生鸡的问题必须得打破这个怪圈才行，我必须得信任ＣＡ，并且通过安全的的方式获取他们的公钥，这样才能把游戏玩下去。</p>
+<p>（公众号码农翻身注：这些ＣＡ本身也有证书来证明自己的身份，并且ＣＡ的信用是像树一样分级的，高层的ＣＡ给底层的ＣＡ做信用背书，而操作系统／浏览器中会内置一些顶层的ＣＡ的证书，相当于你自动信任了他们。　这些顶层的ＣＡ证书一定得安全地放入操作系统／浏览器当中，否则世界大乱。）</p>
+<h2 id="Https"><a href="#Https" class="headerlink" title="Https"></a>Https</h2><p>终于可以介绍https了，前面已经介绍了https的原理， 你把张大胖替换成浏览器， 把Bill 替换成某个网站就行了。</p>
+<p>一个简化的（例如下图没有包含Pre-Master Secret）https流程图是这样的， 如果你理解了前面的原理，这张图就变得非常简单：<br><img src="http://i1.buimg.com/1949/ecbc530393f88118.png" alt="image"></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/30/MasterPromise/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/07/30/MasterPromise/" itemprop="url">
                   Master Promise
                 </a>
               
@@ -520,7 +710,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/20/2017-07-20-01/">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/20/在浏览器地址栏输入url，按下回车后究竟发生了什么？/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="赖宝">
@@ -542,7 +732,7 @@
             
               
                 
-                <a class="post-title-link" href="/2017/07/20/2017-07-20-01/" itemprop="url">
+                <a class="post-title-link" href="/2017/07/20/在浏览器地址栏输入url，按下回车后究竟发生了什么？/" itemprop="url">
                   在浏览器地址栏输入url,按下回车后究竟发生了什么?
                 </a>
               
@@ -1617,172 +1807,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/06/06/JavaScript面向对象系列：三、理解对象/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/06/06/JavaScript面向对象系列：三、理解对象/" itemprop="url">
-                  JavaScript面向对象系列：三、理解对象构造函数和原型对象
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-06T00:00:00+08:00">
-                2017-06-06
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。"><a href="#js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。" class="headerlink" title="js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。"></a>js中的对象是动态的，可以在代码执行的任意时刻发生改变。基于类的语言会根据类的定义锁定对象，js对象没有这种限制。js编程的一大重点就是管理对象。</h2><h2 id="当一个属性第一次被添加给对象时，js在对象上调用一个名为-Put-的内部方法。-Put-方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用-Put-的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。"><a href="#当一个属性第一次被添加给对象时，js在对象上调用一个名为-Put-的内部方法。-Put-方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用-Put-的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。" class="headerlink" title="当一个属性第一次被添加给对象时，js在对象上调用一个名为 [[Put]] 的内部方法。 [[Put]] 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 [[Put]] 的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。"></a>当一个属性第一次被添加给对象时，js在对象上调用一个名为 <strong><em>[[Put]]</em></strong> 的内部方法。 <strong><em>[[Put]]</em></strong> 方法会在对象上创建一个新的节点来保存属性们就像第一次在哈希表上添加一个键一样。这个操作不仅指定了初始值，也定义了属性的一些特征。调用 <strong><em>[[Put]]</em></strong> 的结果是在对象上创建了一个自有属性。一个自有属性表明仅仅该指定对象实例拥有该属性。该属性被直接保存在实力内，对该属性的所有操作都必须通过该对象进项。</h2><h2 id="当一个已有的属性被赋予一个新值的时候，调用一个名为-Set-的方法。该方法将属性的当前方法替换为新值。"><a href="#当一个已有的属性被赋予一个新值的时候，调用一个名为-Set-的方法。该方法将属性的当前方法替换为新值。" class="headerlink" title="当一个已有的属性被赋予一个新值的时候，调用一个名为 [[Set]] 的方法。该方法将属性的当前方法替换为新值。"></a>当一个已有的属性被赋予一个新值的时候，调用一个名为 <strong><em>[[Set]]</em></strong> 的方法。该方法将属性的当前方法替换为新值。</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span> <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">&#125;;</div><div class="line">person.age = <span class="number">25</span>; <span class="comment">//调用 [[Put]] 方法</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>; <span class="comment">//调用 [[Set]] 方法</span></div></pre></td></tr></table></figure>
-<h2 id="属性探测"><a href="#属性探测" class="headerlink" title="属性探测"></a>属性探测</h2><p>不要使用一下模式探测属性是否存在<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span>(person.age)&#123;</div><div class="line">    <span class="comment">//todo</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<p>因为当person.age 为一个对象、非空字符串、非零数字、true时，会判断为真。当person为 null、undefined、0、false、NaN或空字符串会判断为假。</p>
-<p>更可靠的属性探测方式是使用 <strong><em>in</em></strong> 操作符。</p>
-<p>例如<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sex"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div></pre></td></tr></table></figure></p>
-<p>使用 <strong><em>in</em></strong> 操作符，在大多数情况下是属性探测的最好的办法。它还有一个额外的好处是不会评估属性的值。当此类评估会导致性能问题或者错误时，这一点很重要。</p>
-<h2 id="在某些情况下，希望检查一个属性是不是自有属性。"><a href="#在某些情况下，希望检查一个属性是不是自有属性。" class="headerlink" title="在某些情况下，希望检查一个属性是不是自有属性。"></a>在某些情况下，希望检查一个属性是不是自有属性。</h2><p><strong><em>in</em></strong> 操作符会检查自有属性和原型属性，所以不能检查出正确结果。</p>
-<p>另一个方法是 hasOwnProperty方法，这个方法只有在属性存在并且是自有属性时才返回true。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span> <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.hasOwnProperty(<span class="string">"name"</span>)); <span class="comment">//true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"toString"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.hasOwnProperty(<span class="string">"toString"</span>)); <span class="comment">//false</span></div></pre></td></tr></table></figure>
-<p>##删除对象属性</p>
-<p>使用 <strong><em>delete</em></strong> 操作符可以将属性从一个对象中删除。将对象的一个属性设置为null并不能将属性从对象中彻底删除，这种做法只会将原值替换为null。</p>
-<p>使用 <strong><em>delete</em></strong> 操作符会调用对象内部名为 <strong><em>[[Delete]]</em></strong> 的内部方法。相当于从哈希表中移除了一个键值对。</p>
-<h2 id="属性枚举"><a href="#属性枚举" class="headerlink" title="属性枚举"></a>属性枚举</h2><p>对象内部属性 <strong><em>[[Enumerable]]</em></strong> 设置为true，则属性可以循环遍历。可以使用 <strong><em>for-in</em></strong> 操作符来遍历一个对象。es5中新增 <strong><em>Object.keys()</em></strong> 来遍历对象的键，返回一个键组成的数组。</p>
-<p>这两种操作符循环遍历有区别， <strong><em>for-in</em></strong> 操作符会遍历自有属性和原型属性，<strong><em>Object.keys()</em></strong> 只会遍历自由属性。</p>
-<p>并不是所有属性都是可枚举的，实际上，对象大部分原生方法的 <strong><em>[[Enumerable]]</em></strong> 设置为false,可以使用 <strong><em>propertyIsEnumerable()</em></strong> 方法来检查一个属性是否为可枚举，每个对象都有这个方法。</p>
-<h2 id="访问器属性"><a href="#访问器属性" class="headerlink" title="访问器属性"></a>访问器属性</h2><p><strong><em>get</em></strong> 和 <strong><em>set</em></strong> 属性时访问器属性，可以定义属性被读取或者写入时候的行为。这两个属性可以只设置其中一个，如果只设置 <strong><em>get</em></strong> 这个属性变为只读，如果只设置 <strong><em>set</em></strong> 这个属性变为只写，这两种情况在严格模式下会报错.</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span>, <span class="comment">//调用 [[Put]] 方法</span></div><div class="line">    set name(value)&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'set'</span>);</div><div class="line">        <span class="keyword">this</span>.name = value;</div><div class="line">    &#125;,</div><div class="line">    get name()&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'get'</span>);</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.name;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">person.name; <span class="comment">//get</span></div><div class="line">person.name = <span class="string">'xiaowang'</span>; <span class="comment">//set</span></div></pre></td></tr></table></figure>
-<p>##通用特征</p>
-<p>有两个属性是数据和访问器都具有的。一个是 <strong><em>[[Enumerable]]</em></strong> ，决定了你是否可以遍历该属性。另一个是<br><strong><em>[[Configurable]]</em></strong> ,决定了该属性是否可配置.可以随时删除或改变一个可配置属性。改变属性特征，可以使用 <strong><em>Object.defineProperty()</em></strong> 方法。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span>,</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">enumerable</span>:<span class="literal">false</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.propertyIsEnumerable(<span class="string">"name"</span>)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> propertites = <span class="built_in">Object</span>.keys(person);</div><div class="line"><span class="built_in">console</span>.log(propertites.length); <span class="comment">//0</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">configurable</span>:<span class="literal">false</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">configurable</span>:<span class="literal">true</span></div><div class="line">&#125;);  <span class="comment">//报错</span></div></pre></td></tr></table></figure>
-<p>一个属性被设置为不可配置了，就不能再修改了。<strong>无法将一个不可配置属性变成可配置属性</strong> 。删除一个不可配置属性，非严格模式下会失败，严格模式下会报错。</p>
-<h2 id="数据属性特征"><a href="#数据属性特征" class="headerlink" title="数据属性特征"></a>数据属性特征</h2><p>数据属性拥有两个访问器属性不具备的特征：</p>
-<p>第一个是 <strong><em>[[Value]]</em></strong> ,包含属性的值，在对象上创建属性时该特征被自动赋值。所有的属性的值都保存在 <strong><em>[[Value]]</em></strong> 中，即使值是一个函数。</p>
-<p>第二个是 <strong><em>[[Writable]]</em></strong> ,该特种是一个布尔值，只是该属性是否可以写入，所有的属性默认是可写的。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperty(person,<span class="string">"name"</span>,&#123;</div><div class="line">    <span class="attr">value</span>:<span class="string">"laowang"</span></div><div class="line">&#125;);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.propertyIsEnumerable(<span class="string">"name"</span>)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div></pre></td></tr></table></figure>
-<p>使用 <strong><em>Object.defineProperty()</em></strong> 定义新的属性时，一定要为所有特征指定一个值，否则布尔值类型的特征会被默认设置为false。上面这个name就是不可枚举，不可配置，不可写。</p>
-<h2 id="定义多重属性"><a href="#定义多重属性" class="headerlink" title="定义多重属性"></a>定义多重属性</h2><p>使用 <strong><em>Object.defineProperty()</em></strong> 可以定义一个属性的特征。使用 <strong><em>Object.defineProperties()</em></strong> 可以定义多个属性的特征。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="built_in">Object</span>.defineProperties(person,&#123;</div><div class="line">    <span class="attr">name</span>:&#123;</div><div class="line">        <span class="attr">value</span>:<span class="string">"laowang"</span>,</div><div class="line">        <span class="attr">configurable</span>:<span class="literal">true</span></div><div class="line">    &#125;,</div><div class="line">    <span class="attr">age</span>:&#123;</div><div class="line">        <span class="attr">value</span>:<span class="number">25</span>,</div><div class="line">        <span class="attr">configurable</span>:<span class="literal">false</span>,</div><div class="line">        <span class="attr">enumerable</span>:<span class="literal">false</span></div><div class="line">    &#125;</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="获取属性特征"><a href="#获取属性特征" class="headerlink" title="获取属性特征"></a>获取属性特征</h2><p>使用 <strong><em>Object.getOwnPropertyDescriptor()</em></strong> 可以获取一个属性的所有特征</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.enumerable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.writable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.value); <span class="comment">//laowang</span></div></pre></td></tr></table></figure>
-<h2 id="对象禁止扩展"><a href="#对象禁止扩展" class="headerlink" title="对象禁止扩展"></a>对象禁止扩展</h2><p>对象也有内部特征，禁止扩展方法是 <strong><em>Object.preventExtensions()</em></strong> 。可以用 <strong><em>Object.isExtensible()</em></strong> 来检查对象的 <strong><em>[[Extensible]]</em></strong> 的值。</p>
-<p>例如<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.preventExtensions(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div></pre></td></tr></table></figure></p>
-<h2 id="对象封印"><a href="#对象封印" class="headerlink" title="对象封印"></a>对象封印</h2><p>对象封印时创建不可扩展对象的第二种方法。对象被封印后是不可扩展的并且所有属性都不可配置。不仅不能给对象添加新属性，也不能删除属性或改变其类型（从数据属性编程访问器属性或者相反）。一个对象被封印，则只能读写它的属性。</p>
-<p>使用 <strong><em>Object.seal()</em></strong> 方法来封印一个对象。对象的 <strong><em>[[Extensible]]</em></strong> 被设置为false。 其余所有属性的 <strong><em>[[Configurate]]</em></strong> 特征被设置为false。可以使用 <strong><em>Object.isSealed()</em></strong>  来判断一个对象是否被封印。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.seal(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//xiaowang</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//xiaowang</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.enumerable); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//false</span></div></pre></td></tr></table></figure>
-<h2 id="对象冻结"><a href="#对象冻结" class="headerlink" title="对象冻结"></a>对象冻结</h2><p>创建不可扩展对象的最后一种方法是冻结对象。如果一个对象被冻结，则不能在对象上添加或者删除属性，不能改变属性类型，也不能写入任何数据属性。被冻结对象是一个数据属性都为只读的封印对象。被冻结的对象无法解冻。使用 <strong><em>Object.freeze()</em></strong> 来冻结一个对象，使用 <strong><em>Object.isFrozen()</em></strong> 来判断一个对象是否被冻结。</p>
-<p>例如</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> person = &#123;</div><div class="line">    <span class="attr">name</span>:<span class="string">"laowang"</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isFrozen(peson)); <span class="comment">//false</span></div><div class="line"></div><div class="line"><span class="built_in">Object</span>.freeze(peson);</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isExtensible(peson)); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isSealed(peson)); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Object</span>.isFrozen(peson)); <span class="comment">//true</span></div><div class="line"></div><div class="line">person.sayName = <span class="function"><span class="keyword">function</span> (<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"sayName"</span> <span class="keyword">in</span> person); <span class="comment">//false</span></div><div class="line"></div><div class="line">person.name = <span class="string">"xiaowang"</span>;</div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="keyword">delete</span> person.name;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"name"</span> <span class="keyword">in</span> person); <span class="comment">//true</span></div><div class="line"><span class="built_in">console</span>.log(person.name); <span class="comment">//laowang</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> descriptor = <span class="built_in">Object</span>.getOwnPropertyDescriptor(person,<span class="string">"name"</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(descriptor.writable); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(descriptor.configurate); <span class="comment">//false</span></div></pre></td></tr></table></figure>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>属性有两种类型：数据属性、访问器属性。数据属性可以保存值，访问器属性不保存值。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -1832,7 +1856,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
