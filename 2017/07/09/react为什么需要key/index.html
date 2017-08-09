@@ -341,8 +341,8 @@
 <h3 id="1-4-react检查两个树形结构的根节点的不同处理方式"><a href="#1-4-react检查两个树形结构的根节点的不同处理方式" class="headerlink" title="1.4 react检查两个树形结构的根节点的不同处理方式"></a>1.4 react检查两个树形结构的根节点的不同处理方式</h3><ol>
 <li>节点类型不同的情况</li>
 </ol>
-<p>如果树形结构的根节点类型不相同，那就意味着改动太大了，也不需要去费心考虑是不是原来那个树形的根节点被移动到其他地方去了，直接认为原来那个树形结构会已经没用，可以扔掉，需要重新构建新的DOM树，原有的树形结构上的react组件都会经历“卸载”的生命周期。也就是，对于 <strong>Virtual DOM</strong> 树这是一个“更新”的过程，但是却可能引发这个树形结构上某些组件的“装载”和“卸载”过程。例如，在更新之前，组件的结构是这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">    &lt;Todos /&gt;</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
-<p>我们想要更新成这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;span&gt;</div><div class="line">    &lt;Todos /&gt;</div><div class="line">&lt;/span&gt;</div></pre></td></tr></table></figure></p>
+<p>如果树形结构的根节点类型不相同，那就意味着改动太大了，也不需要去费心考虑是不是原来那个树形的根节点被移动到其他地方去了，直接认为原来那个树形结构会已经没用，可以扔掉，需要重新构建新的DOM树，原有的树形结构上的react组件都会经历“卸载”的生命周期。也就是，对于 <strong>Virtual DOM</strong> 树这是一个“更新”的过程，但是却可能引发这个树形结构上某些组件的“装载”和“卸载”过程。例如，在更新之前，组件的结构是这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>我们想要更新成这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;span&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure></p>
 <p>那么react会认为要废掉之前的div节点，包括下面的所有的子节点，一切推到重新来，重新构建一个span节点以及其子节点。看似浪费，但是为了避免 <strong>O(N^3)</strong> 的时间复杂度，react必须要选一个更简单更快的算法，也就只能用这种方式。</p>
 <p>作为开发者，很显然要避免作为包裹功能的节点类型被随意改变。</p>
 <ol>
@@ -402,8 +402,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/07/03/动手实现一个简单的浏览器端js模块加载器/" rel="next" title="动手实现一个简单的浏览器端js模块加载器">
-                <i class="fa fa-chevron-left"></i> 动手实现一个简单的浏览器端js模块加载器
+              <a href="/2017/07/09/知识点整理 - 前端涉及的各种像素概念以及 viewport 汇总/" rel="next" title="知识点整理 - 前端涉及的各种像素概念以及 viewport 汇总">
+                <i class="fa fa-chevron-left"></i> 知识点整理 - 前端涉及的各种像素概念以及 viewport 汇总
               </a>
             
           </div>
@@ -486,14 +486,32 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">19</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
 
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
           
 
         </nav>

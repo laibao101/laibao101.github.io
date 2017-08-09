@@ -1,0 +1,763 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="本文基于 JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals 阅读整理而来, 其中对于原文中的内容进行了部分翻译与增删, 例如 ES6 中开发的注意事项以及三者之间的区别等等, 望周知. 阅读本文内容的先备知识包括:  理解 JavaScript 中的 this 关键字 Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JavaScript 中至关重要的 Apply, Call 和 Bind">
+<meta property="og:url" content="http://blog.webtoatl.cn/2017/06/07/JavaScript 中至关重要的 Apply, Call 和 Bind/index.html">
+<meta property="og:site_name" content="赖宝的宝">
+<meta property="og:description" content="本文基于 JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals 阅读整理而来, 其中对于原文中的内容进行了部分翻译与增删, 例如 ES6 中开发的注意事项以及三者之间的区别等等, 望周知. 阅读本文内容的先备知识包括:  理解 JavaScript 中的 this 关键字 Java">
+<meta property="og:updated_time" content="2017-08-06T14:44:54.008Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JavaScript 中至关重要的 Apply, Call 和 Bind">
+<meta name="twitter:description" content="本文基于 JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals 阅读整理而来, 其中对于原文中的内容进行了部分翻译与增删, 例如 ES6 中开发的注意事项以及三者之间的区别等等, 望周知. 阅读本文内容的先备知识包括:  理解 JavaScript 中的 this 关键字 Java">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.webtoatl.cn/2017/06/07/JavaScript 中至关重要的 Apply, Call 和 Bind/"/>
+
+
+
+
+
+  <title> JavaScript 中至关重要的 Apply, Call 和 Bind | 赖宝的宝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">赖宝的宝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">前端技能分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/06/07/JavaScript 中至关重要的 Apply, Call 和 Bind/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                JavaScript 中至关重要的 Apply, Call 和 Bind
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-06-07T00:00:00+08:00">
+                2017-06-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文基于 <a href="http://javascriptissexy.com/javascript-apply-call-and-bind-methods-are-essential-for-javascript-professionals/#" target="_blank" rel="external">JavaScript’s Apply, Call, and Bind Methods are Essential for JavaScript Professionals</a> 阅读整理而来, 其中对于原文中的内容进行了部分翻译与增删, 例如 ES6 中开发的注意事项以及三者之间的区别等等, 望周知. 阅读本文内容的先备知识包括:</p>
+<ul>
+<li>理解 JavaScript 中的 this 关键字</li>
+<li>JavaScript 对象概念</li>
+<li>JavaScript 闭包概念</li>
+</ul>
+<p>如果你对前面提到的先备知识有所了解, 你应该知道 JavaScript 中的函数其实是一种对象. 而作为对象, 函数是可以有方法的, 包括非常强大的 <code>Apply</code>, <code>Call</code> 以及 <code>Bind</code> 方法. 一方面, Apply 方法和 Call 方法的用途几乎相同, 在 JavaScript 中被频繁使用于方法借用和明确 this 关键字指向等场景. 我们也将 Apply 用于参数可变的函数; 在后文中你将会对此有更多的了解. 另一方面, 我们会使用 Bind 来给方法指定 this 指向值或者函数柯里化 (currying functions).</p>
+<p>我们会讨论在 JavaScript 中使用这三种方法的每一个场景. Apply 和 Call 方法是在 ECMAScript 3 标准中出现的(可以在IE 6, 7, 8 以及现代浏览器中使用), ECAMScript 5 标准添加了 Bind 这个方法. 由于三种方法都非常强大, 开发时你一定会用到其中一个. 让我们先从 Bind 方法说起.</p>
+<h2 id="Bind-方法"><a href="#Bind-方法" class="headerlink" title="Bind 方法"></a>Bind 方法</h2><p>我们用 Bind() 来实现在指明函数内部 this 指向的情况下去调用该函数, 换句话说, bind() 允许我们非常简单的在函数或者方法被调用时绑定 this 到指定对象上.</p>
+<p>当我们在一个方法中用到了 this, 而这个方法调用于一个接收器对象, 我们会需要使用到 bind() 方法; 在这种情况下, 由于 this 不一定完全如我们所期待的绑定在目标对象上, 程序有时便会出错;</p>
+<h2 id="Bind-允许我们明确指定方法中的-this-指向"><a href="#Bind-允许我们明确指定方法中的-this-指向" class="headerlink" title="Bind 允许我们明确指定方法中的 this 指向"></a>Bind 允许我们明确指定方法中的 this 指向</h2><p>当以下按钮被点击的时候, 文本输入框会被随机填入一个名字.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// &lt;button&gt;Get Random Person&lt;/button&gt;​</span></div><div class="line"><span class="comment">// &lt;input type="text"&gt;</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> user = &#123;</div><div class="line">    <span class="attr">data</span>        :[</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"T. Woods"</span>, <span class="attr">age</span>:<span class="number">37</span>&#125;,</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"P. Mickelson"</span>, <span class="attr">age</span>:<span class="number">43</span>&#125;</div><div class="line">    ],</div><div class="line">    <span class="attr">clickHandler</span>:<span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> randomNum = ((<span class="built_in">Math</span>.random () * <span class="number">2</span> | <span class="number">0</span>) + <span class="number">1</span>) - <span class="number">1</span>; <span class="comment">// random number between 0 and 1​</span></div><div class="line">​</div><div class="line">        <span class="comment">// 从 data 数组中随机选取一个名字填入 input 框内</span></div><div class="line">        $(<span class="string">"input"</span>).val(<span class="keyword">this</span>.data[randomNum].name + <span class="string">" "</span> + <span class="keyword">this</span>.data[randomNum].age);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// 给点击事件添加一个事件处理器</span></div><div class="line">$(<span class="string">"button"</span>).click(user.clickHandler);</div></pre></td></tr></table></figure>
+<p>当你点击按钮时, 会发现一个报错信息: 因为 clickHandler() 方法中的 this 绑定的是按钮 HTML 内容的上下文, 因为这才是 clickHandler 方法的执行时的调用对象.</p>
+<p>在 JavaScript 中这种问题比较常见, JavaScript 框架中例如 Backbone.js, jQuery 都自动为我们做好了绑定的工作, 所以在使用时 this 总是可以绑定到我们所期望的那个对象上.</p>
+<p>为了解决之前例子中存在的问题, 我们利用 bind() 方法将 <code>$(&quot;button&quot;).click(user.clickHandler);</code> 换成以下形式:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$(<span class="string">"button"</span>).click(user.clickHandler.bind(user));</div></pre></td></tr></table></figure>
+<p>再考虑另一个方法来修复 this 的值: 你可以给 click() 方法传递一个匿名回调函数, jQuery 会将匿名函数的 this 绑定到按钮对象上.</p>
+<blockquote>
+<p>bind() 函数在 ECMA-262 第五版才被加入；它可能无法在所有浏览器上运行。你可以部份地在脚本开头加入以下代码，就能使它运作，让不支持的浏览器也能使用 bind() 功能。 - MDN</p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">if</span> (!<span class="built_in">Function</span>.prototype.bind) &#123;</div><div class="line">  <span class="built_in">Function</span>.prototype.bind = <span class="function"><span class="keyword">function</span>(<span class="params">oThis</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> <span class="keyword">this</span> !== <span class="string">"function"</span>) &#123;</div><div class="line">      <span class="comment">// closest thing possible to the ECMAScript 5</span></div><div class="line">      <span class="comment">// internal IsCallable function</span></div><div class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> <span class="built_in">TypeError</span>(<span class="string">"Function.prototype.bind - what is trying to be bound is not callable"</span>);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> aArgs = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>, <span class="number">1</span>), </div><div class="line">        fToBind = <span class="keyword">this</span>, <span class="comment">// 此处的 this 指向目标函数</span></div><div class="line">        fNOP = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;,</div><div class="line">        fBound = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">          <span class="keyword">return</span> fToBind.apply(<span class="keyword">this</span> <span class="keyword">instanceof</span> fNOP</div><div class="line">            ? <span class="keyword">this</span> <span class="comment">// 此处 this 为 调用 new obj() 时所生成的 obj 本身</span></div><div class="line">            : oThis || <span class="keyword">this</span>, <span class="comment">// 若 oThis 无效则将 fBound 绑定到 this</span></div><div class="line">            <span class="comment">// 将通过 bind 传递的参数和调用时传递的参数进行合并, 并作为最终的参数传递</span></div><div class="line">            aArgs.concat(<span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>)));</div><div class="line">        &#125;;</div><div class="line"></div><div class="line">    <span class="comment">// 将目标函数的原型对象拷贝到新函数中，因为目标函数有可能被当作构造函数使用</span></div><div class="line">    fNOP.prototype = <span class="keyword">this</span>.prototype;</div><div class="line">    fBound.prototype = <span class="keyword">new</span> fNOP();</div><div class="line"></div><div class="line">    <span class="keyword">return</span> fBound;</div><div class="line">  &#125;;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>继续之前的例子, 如果我们将包含 this 的方法赋值给一个变量, 那么 this 的指向也会绑定到另一个对象上, 如下所示:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 全局变量 data</span></div><div class="line"><span class="keyword">var</span> data = [</div><div class="line">    &#123;<span class="attr">name</span>:<span class="string">"Samantha"</span>, <span class="attr">age</span>:<span class="number">12</span>&#125;,</div><div class="line">    &#123;<span class="attr">name</span>:<span class="string">"Alexis"</span>, <span class="attr">age</span>:<span class="number">14</span>&#125;</div><div class="line">]</div><div class="line">​</div><div class="line"><span class="keyword">var</span> user = &#123;</div><div class="line">    <span class="comment">// 局部变量 data</span></div><div class="line">    data    :[</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"T. Woods"</span>, <span class="attr">age</span>:<span class="number">37</span>&#125;,</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"P. Mickelson"</span>, <span class="attr">age</span>:<span class="number">43</span>&#125;</div><div class="line">    ],</div><div class="line">    <span class="attr">showData</span>:<span class="function"><span class="keyword">function</span>(<span class="params">event</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> randomNum = ((<span class="built_in">Math</span>.random () * <span class="number">2</span> | <span class="number">0</span>) + <span class="number">1</span>) - <span class="number">1</span>; <span class="comment">// random number between 0 and 1​</span></div><div class="line">​</div><div class="line">        <span class="built_in">console</span>.log(<span class="keyword">this</span>.data[randomNum].name + <span class="string">" "</span> + <span class="keyword">this</span>.data[randomNum].age);</div><div class="line">    &#125;</div><div class="line">​</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// 将 user 对象的 showData 方法赋值给一个变量</span></div><div class="line"><span class="keyword">var</span> showDataVar = user.showData;</div><div class="line">​</div><div class="line">showDataVar(); <span class="comment">// Samantha 12 (来自全局变量数组而非局部变量数组)​</span></div></pre></td></tr></table></figure>
+<p>当我们执行 showDataVar() 函数时, 输出到 console 的数值来自全局 data 数组, 而不是 user 对象. 这是因为 showDataVar() 函数是被当做一个全局函数执行的, 所以在函数内部 this 被绑定位全局对象, 即浏览器中的 window 对象.</p>
+<p>来, 我们用 bind 方法来修复这个 bug.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// Bind the showData method to the user object</span></div><div class="line"><span class="keyword">var</span> showDataVar = user.showData.bind(user);</div></pre></td></tr></table></figure>
+<h2 id="Bind-方法允许我们实现函数借用"><a href="#Bind-方法允许我们实现函数借用" class="headerlink" title="Bind 方法允许我们实现函数借用"></a>Bind 方法允许我们实现函数借用</h2><p>在 JavaScript 中, 我们可以传递函数, 返回函数, 借用他们等等, 而 bind() 方法使函数借用变得极其简单. 以下为一个函数借用的例子:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">// cars 对象</span></div><div class="line"><span class="keyword">var</span> cars = &#123;</div><div class="line">    <span class="attr">data</span>:[</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"Honda Accord"</span>, <span class="attr">age</span>:<span class="number">14</span>&#125;,</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"Tesla Model S"</span>, <span class="attr">age</span>:<span class="number">2</span>&#125;</div><div class="line">    ]</div><div class="line">​</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// 我们从之前定义的 user 对象借用 showData 方法</span></div><div class="line"><span class="comment">// 这里我们将 user.showData 方法绑定到刚刚新建的 cars 对象上​</span></div><div class="line">cars.showData = user.showData.bind(cars);</div><div class="line">cars.showData(); <span class="comment">// Honda Accord 14​</span></div></pre></td></tr></table></figure>
+<p>这里存在一个问题, 当我们在 cars 对象上添加一个新方法(showData)时我们可能不想只是简单的借用一个函数那样, 因为 cars 本身可能已经有一个方法或者属性叫做 showData 了, 我们不想意外的将这个方法覆盖了. 正如在之后的 <em>Apply 和 Call 方法</em> 章节我们会介绍, 借用函数的最佳实践应该是使用 Apply 或者 Call 方法.</p>
+<h2 id="Bind-方法允许我们柯里化一个函数"><a href="#Bind-方法允许我们柯里化一个函数" class="headerlink" title="Bind 方法允许我们柯里化一个函数"></a>Bind 方法允许我们柯里化一个函数</h2><blockquote>
+<p>柯里化的概念很简单, 只传递给函数一部分参数来调用它, 让它返回一个函数去处理剩下的参数. 你可以一次性地调用 curry 函数, 也可以每次只传一个参数分多次调用, 以下为一个简单的示例. - <a href="https://llh911001.gitbooks.io/mostly-adequate-guide-chinese/content/ch4.html" target="_blank" rel="external">JS 函数是编程指南 第 4 章: 柯里化（curry）</a></p>
+</blockquote>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> add = <span class="function"><span class="keyword">function</span>(<span class="params">x</span>) </span>&#123;</div><div class="line">  <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params">y</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> x + y;</div><div class="line">  &#125;;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> increment = add(<span class="number">1</span>);</div><div class="line"><span class="keyword">var</span> addTen = add(<span class="number">10</span>);</div><div class="line"></div><div class="line">increment(<span class="number">2</span>);</div><div class="line"><span class="comment">// 3</span></div><div class="line"></div><div class="line">addTen(<span class="number">2</span>);</div><div class="line"><span class="comment">// 12</span></div></pre></td></tr></table></figure>
+<p>现在, 我们使用 bind() 方法来实现函数的柯里化. 我们首先定义一个接收三个参数的 greet() 函数:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">greet</span>(<span class="params">gender, age, name</span>) </span>&#123;</div><div class="line">    <span class="comment">// if a male, use Mr., else use Ms.​</span></div><div class="line">    <span class="keyword">var</span> salutation = gender === <span class="string">"male"</span> ? <span class="string">"Mr. "</span> : <span class="string">"Ms. "</span>;</div><div class="line"></div><div class="line">    <span class="keyword">if</span> (age &gt; <span class="number">25</span>) &#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hello, "</span> + salutation + name + <span class="string">"."</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="string">"Hey, "</span> + name + <span class="string">"."</span>;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>接着我们使用 bind() 方法柯里化 greet() 方法. bind() 接收的第一个参数指定了 this 的值:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">// 在 greet 函数中我们可以传递 null, 因为函数中并未使用到 this 关键字</span></div><div class="line"><span class="keyword">var</span> greetAnAdultMale = greet.bind (<span class="literal">null</span>, <span class="string">"male"</span>, <span class="number">45</span>);</div><div class="line">​</div><div class="line">greetAnAdultMale(<span class="string">"John Hartlove"</span>); <span class="comment">// "Hello, Mr. John Hartlove."​</span></div><div class="line">​</div><div class="line"><span class="keyword">var</span> greetAYoungster = greet.bind(<span class="literal">null</span>, <span class="string">""</span>, <span class="number">16</span>);</div><div class="line">greetAYoungster(<span class="string">"Alex"</span>); <span class="comment">// "Hey, Alex."​</span></div><div class="line">greetAYoungster(<span class="string">"Emma Waterloo"</span>); <span class="comment">// "Hey, Emma Waterloo."​</span></div></pre></td></tr></table></figure>
+<p>当我们用 bind() 实现柯里化时, greet() 函数参数中除了最后一个参数都被预定义好了, 所以当我们调用柯里化后的新函数时只需要指定最后一位参数.</p>
+<p>所以小结一下, bind() 方法允许我们明确指定对象方法中的 this 指向, 我们可以借用, 复制一个方法或者将方法赋值为一个可作为函数执行的变量. 我们以可以借用 bind 实现函数柯里化.</p>
+<h2 id="JavaScript-中的-Apply-和-Call-方法"><a href="#JavaScript-中的-Apply-和-Call-方法" class="headerlink" title="JavaScript 中的 Apply 和 Call 方法"></a>JavaScript 中的 Apply 和 Call 方法</h2><p>作为 JavaScript 中最常用的两个函数方法, apply 和 call 允许我们借用函数以及在函数调用中指定 this 指向. 除此外, apply 函数允许我们在执行函数时传入一个参数数组, 以此使函数在执行可变参数的函数时可以将每个参数单独的传入函数并得到处理.</p>
+<h2 id="使用-apply-或者-call-设置-this"><a href="#使用-apply-或者-call-设置-this" class="headerlink" title="使用 apply 或者 call 设置 this"></a>使用 apply 或者 call 设置 this</h2><p>当我们使用 apply 或者 call 时, 传入的第一个参数为目标函数中 this 指向的对象, 以下为一个简单的例子:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 全局变量​</span></div><div class="line"><span class="keyword">var</span> avgScore = <span class="string">"global avgScore"</span>;</div><div class="line">​</div><div class="line"><span class="comment">// 全局函数</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">avg</span>(<span class="params">arrayOfScores</span>) </span>&#123;</div><div class="line">    <span class="comment">// 分数相加并返回结果</span></div><div class="line">    <span class="keyword">var</span> sumOfScores = arrayOfScores.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur, index, array</span>) </span>&#123;</div><div class="line">        <span class="keyword">return</span> prev + cur;</div><div class="line">    &#125;);</div><div class="line">​</div><div class="line">    <span class="comment">// 这里的 "this" 会被绑定到全局对象上, 除非使用 Call 或者 Apply 明确指定 this 的指向</span></div><div class="line">    <span class="keyword">this</span>.avgScore = sumOfScores / arrayOfScores.length;</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="keyword">var</span> gameController = &#123;</div><div class="line">    <span class="attr">scores</span>  :[<span class="number">20</span>, <span class="number">34</span>, <span class="number">55</span>, <span class="number">46</span>, <span class="number">77</span>],</div><div class="line">    <span class="attr">avgScore</span>:<span class="literal">null</span>​</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// 调用 avg 函数, this 指向 window 对象​</span></div><div class="line">avg(gameController.scores);</div><div class="line"><span class="comment">// 证明 avgScore 已经被设置为 window 对象的属性​</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.avgScore); <span class="comment">// 46.4​</span></div><div class="line"><span class="built_in">console</span>.log(gameController.avgScore); <span class="comment">// null​</span></div><div class="line">​</div><div class="line"><span class="comment">// 重置全局变量</span></div><div class="line">avgScore = <span class="string">"global avgScore"</span>;</div><div class="line">​</div><div class="line"><span class="comment">// 使用 call() 方法明确将 "this" 绑定到 gameController 对象​</span></div><div class="line">avg.call(gameController, gameController.scores);</div><div class="line">​</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">window</span>.avgScore); <span class="comment">// 全局变量 avgScore 的值​</span></div><div class="line"><span class="built_in">console</span>.log(gameController.avgScore); <span class="comment">// 46.4</span></div></pre></td></tr></table></figure>
+<p>以上例子中 call() 中的第一个参数明确了 this 的指向, 第二参数被传递给了 avg() 函数.</p>
+<p>apply 和 call 的用法几乎相同, 唯一的差别在于当函数需要传递多个变量时, apply 可以接受一个数组作为参数输入, call 则是接受一系列的单独变量.</p>
+<h3 id="在灰调函数中用-call-或者-apply-设置-this"><a href="#在灰调函数中用-call-或者-apply-设置-this" class="headerlink" title="在灰调函数中用 call 或者 apply 设置 this"></a>在灰调函数中用 call 或者 apply 设置 this</h3><p>以下为一个例子, 这种做法允许我们在执行 callback 函数时能够明确 其内部的 this 指向</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 定义一个方法</span></div><div class="line"><span class="keyword">var</span> clientData = &#123;</div><div class="line">    <span class="attr">id</span>: <span class="number">094545</span>,</div><div class="line">    <span class="attr">fullName</span>: <span class="string">"Not Set"</span>,</div><div class="line">    <span class="comment">// clientData 对象中的一个方法</span></div><div class="line">    setUserName: <span class="function"><span class="keyword">function</span> (<span class="params">firstName, lastName</span>)  </span>&#123;</div><div class="line">        <span class="keyword">this</span>.fullName = firstName + <span class="string">" "</span> + lastName;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">getUserInput</span>(<span class="params">firstName, lastName, callback, callbackObj</span>) </span>&#123;</div><div class="line">    <span class="comment">// 使用 apply 方法将 "this" 绑定到 callbackObj 对象</span></div><div class="line">    callback.apply(callbackObj, [firstName, lastName]);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>如下样例中传递给 callback 函数<br>中的参数将会在 clientData 对象中被设置/更新.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">getUserInput(<span class="string">"Barack"</span>, <span class="string">"Obama"</span>, clientData.setUserName, clientData);</div><div class="line"><span class="built_in">console</span>.log(clientData.fullName); <span class="comment">// Barack Obama​</span></div></pre></td></tr></table></figure>
+<h2 id="使用-Apply-或者-Call-借用函数-必备知识"><a href="#使用-Apply-或者-Call-借用函数-必备知识" class="headerlink" title="使用 Apply 或者 Call 借用函数(必备知识)"></a>使用 Apply 或者 Call 借用函数(必备知识)</h2><p>相比 bind 方法, 我们使用 apply 或者 call 方法实现函数借用能够有很大的施展空间. 接下来我们考虑从 Array 中借用方法的问题, 让我们定义一个<strong>类数组对象(array-like object)</strong>然后从数组中借用方法来处理我们定义的这个对象, 不过在这之前请记住我们要操作的是一个对象, 而不是数组;</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// An array-like object: note the non-negative integers used as keys​</span></div><div class="line"><span class="keyword">var</span> anArrayLikeObj = &#123;<span class="number">0</span>:<span class="string">"Martin"</span>, <span class="number">1</span>:<span class="number">78</span>, <span class="number">2</span>:<span class="number">67</span>, <span class="number">3</span>:[<span class="string">"Letta"</span>, <span class="string">"Marieta"</span>, <span class="string">"Pauline"</span>], <span class="attr">length</span>:<span class="number">4</span> &#125;;</div></pre></td></tr></table></figure>
+<p>接下来我们可以这样使用数组的原生方法:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"> <span class="comment">// Make a quick copy and save the results in a real array:​</span></div><div class="line"><span class="comment">// First parameter sets the "this" value​</span></div><div class="line"><span class="keyword">var</span> newArray = <span class="built_in">Array</span>.prototype.slice.call(anArrayLikeObj, <span class="number">0</span>);</div><div class="line">​</div><div class="line"><span class="built_in">console</span>.log(newArray); <span class="comment">// ["Martin", 78, 67, Array[3]]​</span></div><div class="line">​</div><div class="line"><span class="comment">// Search for "Martin" in the array-like object​</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Array</span>.prototype.indexOf.call(anArrayLikeObj, <span class="string">"Martin"</span>) === <span class="number">-1</span> ? <span class="literal">false</span> : <span class="literal">true</span>); <span class="comment">// true​</span></div><div class="line">​</div><div class="line"><span class="comment">// Try using an Array method without the call () or apply ()​</span></div><div class="line"><span class="built_in">console</span>.log(anArrayLikeObj.indexOf(<span class="string">"Martin"</span>) === <span class="number">-1</span> ? <span class="literal">false</span> : <span class="literal">true</span>); <span class="comment">// Error: Object has no method 'indexOf'​</span></div><div class="line">​</div><div class="line"><span class="comment">// Reverse the object:​</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Array</span>.prototype.reverse.call(anArrayLikeObj));</div><div class="line"><span class="comment">// &#123;0: Array[3], 1: 67, 2: 78, 3: "Martin", length: 4&#125;​</span></div><div class="line">​</div><div class="line"><span class="comment">// Sweet. We can pop too:​</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Array</span>.prototype.pop.call(anArrayLikeObj));</div><div class="line"><span class="built_in">console</span>.log(anArrayLikeObj); <span class="comment">// &#123;0: Array[3], 1: 67, 2: 78, length: 3&#125;​</span></div><div class="line">​</div><div class="line"><span class="comment">// What about push?​</span></div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Array</span>.prototype.push.call(anArrayLikeObj, <span class="string">"Jackie"</span>));</div><div class="line"><span class="built_in">console</span>.log(anArrayLikeObj); <span class="comment">// &#123;0: Array[3], 1: 67, 2: 78, 3: "Jackie", length: 4&#125;​</span></div></pre></td></tr></table></figure>
+<p>这样的操作使得我们定义的对象既保留有所有对象的属性, 同时也能够在对象上使用数组方法.</p>
+<p><strong>arguments</strong> 对象是所有 JavaScript 函数中的一个类数组对象, 因此 call() 和 apply() 的一个最常用的用法是从 arguments 中提取参数并将其传递给一个函数.</p>
+<p>以下为 Ember.js 源码中的一部分, 加上了我的一些注释:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">transitionTo</span>(<span class="params">name</span>) </span>&#123;</div><div class="line">    <span class="comment">// 因为 arguments 是一个类数组对象, 所以我们可以使用 slice()来处理它</span></div><div class="line">    <span class="comment">// 参数 "1" 表示我们返回一个从下标为1到结尾元素的数组</span></div><div class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>, <span class="number">1</span>);</div><div class="line">​</div><div class="line">    <span class="comment">// 添加该行代码用于查看 args 的值</span></div><div class="line">    <span class="built_in">console</span>.log(args);</div><div class="line">​</div><div class="line">    <span class="comment">// 注释本例不需要使用到的代码</span></div><div class="line">    <span class="comment">//doTransition(this, name, this.updateURL, args);​</span></div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// 使用案例</span></div><div class="line">transitionTo(<span class="string">"contact"</span>, <span class="string">"Today"</span>, <span class="string">"20"</span>); <span class="comment">// ["Today", "20"]​</span></div></pre></td></tr></table></figure>
+<p>以上例子中, args 变量是一个真正的数组. 从以上案例中我们可以写一个得到快速得到传递给函数的所有参数(以数组形式)的函数:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">doSomething</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>);</div><div class="line">    <span class="built_in">console</span>.log(args);</div><div class="line">&#125;</div><div class="line">​</div><div class="line">doSomething(<span class="string">"Water"</span>, <span class="string">"Salt"</span>, <span class="string">"Glue"</span>); <span class="comment">// ["Water", "Salt", "Glue"]​</span></div></pre></td></tr></table></figure>
+<p>考虑到字符串是不可变的, 如果使用 apply 或者 call 方法借用字符串的方法, 不可变的数组操作对他们来说才是有效的, 所以你不能使用类似 reverse 或者 pop 等等这类的方法. 除此外, 我们也可以用他们借用我们自定义的方法.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> gameController = &#123;</div><div class="line">    <span class="attr">scores</span>  :[<span class="number">20</span>, <span class="number">34</span>, <span class="number">55</span>, <span class="number">46</span>, <span class="number">77</span>],</div><div class="line">    <span class="attr">avgScore</span>:<span class="literal">null</span>,</div><div class="line">    <span class="attr">players</span> :[</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"Tommy"</span>, <span class="attr">playerID</span>:<span class="number">987</span>, <span class="attr">age</span>:<span class="number">23</span>&#125;,</div><div class="line">        &#123;<span class="attr">name</span>:<span class="string">"Pau"</span>, <span class="attr">playerID</span>:<span class="number">87</span>, <span class="attr">age</span>:<span class="number">33</span>&#125;</div><div class="line">    ]</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="keyword">var</span> appController = &#123;</div><div class="line">    <span class="attr">scores</span>  :[<span class="number">900</span>, <span class="number">845</span>, <span class="number">809</span>, <span class="number">950</span>],</div><div class="line">    <span class="attr">avgScore</span>:<span class="literal">null</span>,</div><div class="line">    <span class="attr">avg</span>     :<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> sumOfScores = <span class="keyword">this</span>.scores.reduce(<span class="function"><span class="keyword">function</span>(<span class="params">prev, cur, index, array</span>) </span>&#123;</div><div class="line">            <span class="keyword">return</span> prev + cur;</div><div class="line">        &#125;);</div><div class="line">        <span class="keyword">this</span>.avgScore = sumOfScores / <span class="keyword">this</span>.scores.length;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line">​</div><div class="line"><span class="comment">// Note that we are using the apply() method, so the 2nd argument has to be an array​</span></div><div class="line">appController.avg.apply(gameController);</div><div class="line"><span class="built_in">console</span>.log(gameController.avgScore); <span class="comment">// 46.4​</span></div><div class="line">​</div><div class="line"><span class="comment">// appController.avgScore is still null; it was not updated, only gameController.avgScore was updated​</span></div><div class="line"><span class="built_in">console</span>.log(appController.avgScore); <span class="comment">// null​</span></div></pre></td></tr></table></figure>
+<p>这个例子非常简单, 我们定义的 gameController 对象借用了 appController 对象的 avg() 方法. 你也许会想, 如果我们借用的函数定义发生了变化, 那么我们的代码会发生什么变化. 借用(复制后)的函数也会变化么, 还是说他在完整复制后已经和原始的方法切断了联系? 让我们用下面这个小例子来说明这个问题:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">appController.maxNum = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.avgScore = <span class="built_in">Math</span>.max.apply(<span class="literal">null</span>, <span class="keyword">this</span>.scores);</div><div class="line">&#125;</div><div class="line">​</div><div class="line">appController.maxNum.apply(gameController, gameController.scores);</div><div class="line"><span class="built_in">console</span>.log(gameController.avgScore); <span class="comment">// 77​</span></div></pre></td></tr></table></figure>
+<p>正如我们所期望的那样, 如果我们修改原始的方法, 这样的变化会在借用实例的方法上体现出来. 我们总是希望如此, 因为我们从来不希望完整的复制一个方法, 我们只是想简单的借用一下.</p>
+<h2 id="使用-apply-执行参数可变的函数"><a href="#使用-apply-执行参数可变的函数" class="headerlink" title="使用 apply() 执行参数可变的函数"></a>使用 apply() 执行参数可变的函数</h2><p>关于 Apply, Call 和 Bind 方法的多功能性和实用性, 我们将讨论一下Apply方法的一个很简单的功能: 使用参数数组执行函数.</p>
+<p>Math.max() 方法是 JavaScript 中一个常见的参数可变函数:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.max(<span class="number">23</span>, <span class="number">11</span>, <span class="number">34</span>, <span class="number">56</span>)); <span class="comment">// 56</span></div></pre></td></tr></table></figure>
+<p>但如果我们有一个数组要传递给 Math.max(), 是不能这样做的:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> allNumbers = [<span class="number">23</span>, <span class="number">11</span>, <span class="number">34</span>, <span class="number">56</span>];</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.max(allNumbers)); <span class="comment">// NaN</span></div></pre></td></tr></table></figure>
+<p>使用 apply 我们可以像下面这样传递数组:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> allNumbers = [<span class="number">23</span>, <span class="number">11</span>, <span class="number">34</span>, <span class="number">56</span>];</div><div class="line"><span class="built_in">console</span>.log(<span class="built_in">Math</span>.max.apply(<span class="literal">null</span>, allNumbers)); <span class="comment">// 56</span></div></pre></td></tr></table></figure>
+<p>正如之前讨论, apply() 的第一个参数用于设置 this 的指向, 但是 Math.max() 并未使用到 this, 所以我们传递 null 给他.</p>
+<p>为了更进一步解释 apply() 在 参数可变函数上的能力, 我们自定义了一个参数可变函数:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> students = [<span class="string">"Peter Alexander"</span>, <span class="string">"Michael Woodruff"</span>, <span class="string">"Judy Archer"</span>, <span class="string">"Malcolm Khan"</span>];</div><div class="line"></div><div class="line"><span class="comment">// 不定义参数, 因为我们可以传递任意多个参数进入该函数​</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">welcomeStudents</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> args = <span class="built_in">Array</span>.prototype.slice.call(<span class="built_in">arguments</span>);</div><div class="line">​</div><div class="line">    <span class="keyword">var</span> lastItem = args.pop();</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Welcome "</span> + args.join (<span class="string">", "</span>) + <span class="string">", and "</span> + lastItem + <span class="string">"."</span>);</div><div class="line">&#125;</div><div class="line">​</div><div class="line">welcomeStudents.apply(<span class="literal">null</span>, students);</div><div class="line"><span class="comment">// Welcome Peter Alexander, Michael Woodruff, Judy Archer, and Malcolm Khan.</span></div></pre></td></tr></table></figure>
+<h2 id="区别与注意事项"><a href="#区别与注意事项" class="headerlink" title="区别与注意事项"></a>区别与注意事项</h2><p>三个函数存在的区别, 用一句话来说的话就是: bind是返回对应函数, 便于稍后调用; apply, call则是立即调用. 除此外, 在 ES6 的箭头函数下, call 和 apply 的失效, 对于箭头函数来说:</p>
+<ul>
+<li>函数体内的 this 对象, 就是定义时所在的对象, 而不是使用时所在的对象;</li>
+<li>不可以当作构造函数, 也就是说不可以使用 new 命令, 否则会抛出一个错误;</li>
+<li>不可以使用 arguments 对象, 该对象在函数体内不存在. 如果要用, 可以用 Rest 参数代替;</li>
+<li>不可以使用 yield 命令, 因此箭头函数不能用作 Generator 函数;</li>
+</ul>
+<p>更多关于箭头函数的介绍在这里就不做过多介绍了, 详情可以查看 <a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Reference/Functions/Arrow_functions" target="_blank" rel="external">Arrow functions</a>.</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>经过上面的叙述, Call, Apply 和 Bind 在设置 this 指向, 声称与执行参数可变函数以及函数借用方面的强大之处已经非常明显. 作为一名 JavaScript 开发者, 你一定会经常见到这种用法, 或者在开发中尝试使用他. 请确保你已经很好的了解了如上所述的概念与用法.</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/06/06/JavaScript面向对象系列：三、理解对象/" rel="next" title="JavaScript面向对象系列：三、理解对象构造函数和原型对象">
+                <i class="fa fa-chevron-left"></i> JavaScript面向对象系列：三、理解对象构造函数和原型对象
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/06/12/JavaScript面向对象系列：四、构造函数和原型对象/" rel="prev" title="JavaScript面向对象系列：四、构造函数和原型对象">
+                JavaScript面向对象系列：四、构造函数和原型对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="赖宝" />
+          <p class="site-author-name" itemprop="name">赖宝</p>
+           
+              <p class="site-description motion-element" itemprop="description">努力学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">17</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Bind-方法"><span class="nav-number">1.</span> <span class="nav-text">Bind 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bind-允许我们明确指定方法中的-this-指向"><span class="nav-number">2.</span> <span class="nav-text">Bind 允许我们明确指定方法中的 this 指向</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bind-方法允许我们实现函数借用"><span class="nav-number">3.</span> <span class="nav-text">Bind 方法允许我们实现函数借用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Bind-方法允许我们柯里化一个函数"><span class="nav-number">4.</span> <span class="nav-text">Bind 方法允许我们柯里化一个函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript-中的-Apply-和-Call-方法"><span class="nav-number">5.</span> <span class="nav-text">JavaScript 中的 Apply 和 Call 方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-apply-或者-call-设置-this"><span class="nav-number">6.</span> <span class="nav-text">使用 apply 或者 call 设置 this</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#在灰调函数中用-call-或者-apply-设置-this"><span class="nav-number">6.1.</span> <span class="nav-text">在灰调函数中用 call 或者 apply 设置 this</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-Apply-或者-Call-借用函数-必备知识"><span class="nav-number">7.</span> <span class="nav-text">使用 Apply 或者 Call 借用函数(必备知识)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-apply-执行参数可变的函数"><span class="nav-number">8.</span> <span class="nav-text">使用 apply() 执行参数可变的函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#区别与注意事项"><span class="nav-number">9.</span> <span class="nav-text">区别与注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">10.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">赖宝</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
