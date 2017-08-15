@@ -87,18 +87,15 @@
 
 
 
-<meta name="description" content="我们为什么需要redux1.1.1 redux是什么通俗的来讲，redux就是一个state管理库 1.1.2 不使用redux构建应用 一般构建的React组件内部可能是一个完整的应用，它自己工作良好，你可以通过属性作为API控制它。但是更多的时候发现React根本无法让两个组件互相交流，使用对方的数据。然后这时候不通过DOM沟通（也就是React体制内）解决的唯一办法就是提升state，将st">
-<meta property="og:type" content="article">
-<meta property="og:title" content="我们为什么需要redux">
-<meta property="og:url" content="http://blog.webtoatl.cn/2017/05/05/我们为什么需要redux/index.html">
+<meta name="description" content="努力学习">
+<meta property="og:type" content="website">
+<meta property="og:title" content="赖宝的宝">
+<meta property="og:url" content="http://blog.webtoatl.cn/page/3/index.html">
 <meta property="og:site_name" content="赖宝的宝">
-<meta property="og:description" content="我们为什么需要redux1.1.1 redux是什么通俗的来讲，redux就是一个state管理库 1.1.2 不使用redux构建应用 一般构建的React组件内部可能是一个完整的应用，它自己工作良好，你可以通过属性作为API控制它。但是更多的时候发现React根本无法让两个组件互相交流，使用对方的数据。然后这时候不通过DOM沟通（也就是React体制内）解决的唯一办法就是提升state，将st">
-<meta property="og:image" content="https://github.com/Nealyang/study-redux/blob/master/resources/pic.png?raw=true">
-<meta property="og:updated_time" content="2017-07-03T13:25:53.164Z">
+<meta property="og:description" content="努力学习">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="我们为什么需要redux">
-<meta name="twitter:description" content="我们为什么需要redux1.1.1 redux是什么通俗的来讲，redux就是一个state管理库 1.1.2 不使用redux构建应用 一般构建的React组件内部可能是一个完整的应用，它自己工作良好，你可以通过属性作为API控制它。但是更多的时候发现React根本无法让两个组件互相交流，使用对方的数据。然后这时候不通过DOM沟通（也就是React体制内）解决的唯一办法就是提升state，将st">
-<meta name="twitter:image" content="https://github.com/Nealyang/study-redux/blob/master/resources/pic.png?raw=true">
+<meta name="twitter:title" content="赖宝的宝">
+<meta name="twitter:description" content="努力学习">
 
 
 
@@ -126,13 +123,13 @@
 
 
 
-  <link rel="canonical" href="http://blog.webtoatl.cn/2017/05/05/我们为什么需要redux/"/>
+  <link rel="canonical" href="http://blog.webtoatl.cn/page/3/"/>
 
 
 
 
 
-  <title> 我们为什么需要redux | 赖宝的宝 </title>
+  <title> 赖宝的宝 </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -157,7 +154,9 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail ">
+  <div class="container sidebar-position-left 
+   page-home 
+ ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -240,9 +239,9 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-
-  <div id="posts" class="posts-expand">
+  <section id="posts" class="posts-expand">
     
+      
 
   
 
@@ -272,7 +271,10 @@
             
             
               
-                我们为什么需要redux
+                
+                <a class="post-title-link" href="/2017/05/05/我们为什么需要redux/" itemprop="url">
+                  我们为什么需要redux
+                </a>
               
             
           </h1>
@@ -323,7 +325,9 @@
       
 
       
-        <h2 id="我们为什么需要redux"><a href="#我们为什么需要redux" class="headerlink" title="我们为什么需要redux"></a>我们为什么需要redux</h2><h3 id="1-1-1-redux是什么"><a href="#1-1-1-redux是什么" class="headerlink" title="1.1.1 redux是什么"></a>1.1.1 redux是什么</h3><pre><code>通俗的来讲，redux就是一个state管理库
+        
+          
+            <h2 id="我们为什么需要redux"><a href="#我们为什么需要redux" class="headerlink" title="我们为什么需要redux"></a>我们为什么需要redux</h2><h3 id="1-1-1-redux是什么"><a href="#1-1-1-redux是什么" class="headerlink" title="1.1.1 redux是什么"></a>1.1.1 redux是什么</h3><pre><code>通俗的来讲，redux就是一个state管理库
 </code></pre><h3 id="1-1-2-不使用redux构建应用"><a href="#1-1-2-不使用redux构建应用" class="headerlink" title="1.1.2 不使用redux构建应用"></a>1.1.2 不使用redux构建应用</h3><ol>
 <li>一般构建的React组件内部可能是一个完整的应用，它自己工作良好，你可以通过属性作为API控制它。但是更多的时候发现React根本无法让两个组件互相交流，使用对方的数据。然后这时候不通过DOM沟通（也就是React体制内）解决的唯一办法就是提升state，将state放到共有的父组件中来管理，再作为props分发回子组件。</li>
 <li>子组件改变父组件state的办法只能是通过事件触发父组件声明好的回调，也就是父组件提前声明好函数或方法作为契约描述自己的state将如何变化，再将它同样作为属性交给子组件使用。这样就出现了一个模式：数据总是单向从顶层向下分发的，但是只有子组件回调在概念上可以回到state顶层影响数据。这样state一定程度上是响应式的。</li>
@@ -342,27 +346,20 @@
 <li>数据流向单一，团队开发互相影响较小。</li>
 </ol>
 
+          
+        
       
     </div>
 
     <div>
       
-        
-
-      
     </div>
 
     <div>
       
-        
-
-      
     </div>
 
     <div>
-      
-        
-
       
     </div>
 
@@ -370,38 +367,25 @@
       
 
       
-        
+
       
 
       
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/05/20/JavaScript面向对象系列：一、类型/" rel="prev" title="JavaScript面向对象系列：一、类型">
-                JavaScript面向对象系列：一、类型 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
       
-
-      
+        <div class="post-eof"></div>
       
     </footer>
   </article>
 
 
+    
+  </section>
 
-    <div class="post-spread">
-      
-    </div>
-  </div>
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span>
+  </nav>
+
 
 
           </div>
@@ -409,10 +393,6 @@
 
 
           
-  <div class="comments" id="comments">
-    
-  </div>
-
 
         </div>
         
@@ -432,17 +412,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel">
+      <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="/images/avatar.gif"
@@ -486,22 +457,6 @@
 
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#我们为什么需要redux"><span class="nav-number">1.</span> <span class="nav-text">我们为什么需要redux</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-1-redux是什么"><span class="nav-number">1.1.</span> <span class="nav-text">1.1.1 redux是什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-2-不使用redux构建应用"><span class="nav-number">1.2.</span> <span class="nav-text">1.1.2 不使用redux构建应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-3-redux为我们做了什么"><span class="nav-number">1.3.</span> <span class="nav-text">1.1.3 redux为我们做了什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-4-按照redux思想来设计"><span class="nav-number">1.4.</span> <span class="nav-text">1.1.4 按照redux思想来设计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-5-用redux的好处"><span class="nav-number">1.5.</span> <span class="nav-text">1.1.5 用redux的好处</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -616,10 +571,6 @@
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
-
-
 
   
 

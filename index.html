@@ -250,6 +250,748 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/08/JavaScript 专题之如何判断两个对象相等/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/08/08/JavaScript 专题之如何判断两个对象相等/" itemprop="url">
+                  JavaScript 专题之如何判断两个对象相等
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T00:00:00+08:00">
+                2017-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>虽然标题写的是如何判断两个对象相等，但本篇我们不仅仅判断两个对象相等，实际上，我们要做到的是如何判断两个参数相等，而这必然会涉及到多种类型的判断。</p>
+<h2 id="相等"><a href="#相等" class="headerlink" title="相等"></a>相等</h2><p>什么是相等？，我们认为只要 === 的结果为 true，两者就相等，然而今天我们重新定义相等：</p>
+<p>我们认为：</p>
+<p>NaN 和 NaN 是相等<br>[1] 和 [1] 是相等<br>{value: 1} 和 {value: 1} 是相等<br>不仅仅是这些长得一样的，还有</p>
+<p>1 和 new Number(1) 是相等<br>‘Curly’ 和 new String(‘Curly’) 是相等<br>true 和 new Boolean(true) 是相等<br>更复杂的我们会在接下来的内容中看到。</p>
+<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>我们的目标是写一个 eq 函数用来判断两个参数是否相等，使用效果如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123; ... &#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> a = [<span class="number">1</span>];</div><div class="line"><span class="keyword">var</span> b = [<span class="number">1</span>];</div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>在写这个看似很简单的函数之前，我们首先了解在一些简单的情况下是如何判断的？</p>
+<h2 id="0-与-0"><a href="#0-与-0" class="headerlink" title="+0 与 -0"></a>+0 与 -0</h2><p>如果 a === b 的结果为 true， 那么 a 和 b 就是相等的吗？一般情况下，当然是这样的，但是有一个特殊的例子，就是 +0 和 -0。</p>
+<p>JavaScript “处心积虑”的想抹平两者的差异：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 表现1</span></div><div class="line"><span class="built_in">console</span>.log(+<span class="number">0</span> === <span class="number">-0</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="comment">// 表现2</span></div><div class="line">(<span class="number">-0</span>).toString() <span class="comment">// '0'</span></div><div class="line">(+<span class="number">0</span>).toString() <span class="comment">// '0'</span></div><div class="line"></div><div class="line"><span class="comment">// 表现3</span></div><div class="line"><span class="number">-0</span> &lt; +<span class="number">0</span> <span class="comment">// false</span></div><div class="line">+<span class="number">0</span> &lt; <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>即便如此，两者依然是不同的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> / +<span class="number">0</span> <span class="comment">// Infinity</span></div><div class="line"><span class="number">1</span> / <span class="number">-0</span> <span class="comment">// -Infinity</span></div><div class="line"></div><div class="line"><span class="number">1</span> / +<span class="number">0</span> === <span class="number">1</span> / <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>也许你会好奇为什么要有 +0 和 -0 呢？</p>
+<p>这是因为 JavaScript 采用了IEEE_754 浮点数表示法(几乎所有现代编程语言所采用)，这是一种二进制表示法，按照这个标准，最高位是符号位(0 代表正，1 代表负)，剩下的用于表示大小。而对于零这个边界值 ，1000(-0) 和 0000(0)都是表示 0 ，这才有了正负零的区别。</p>
+<p>也许你会好奇什么时候会产生 -0 呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Math.round(-0.1) // -0</div></pre></td></tr></table></figure></p>
+<p>那么我们又该如何在 === 结果为 true 的时候，区别 0 和 -0 得出正确的结果呢？我们可以这样做：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<h2 id="NaN"><a href="#NaN" class="headerlink" title="NaN"></a>NaN</h2><p>在本篇，我们认为 NaN 和 NaN 是相等的，那又该如何判断出 NaN 呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="literal">NaN</span> === <span class="literal">NaN</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>利用 NaN 不等于自身的特性，我们可以区别出 NaN，那么这个 eq 函数又该怎么写呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<h2 id="eq-函数"><a href="#eq-函数" class="headerlink" title="eq 函数"></a>eq 函数</h2><p>现在，我们已经可以去写 eq 函数的第一版了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// eq 第一版</span></div><div class="line"><span class="comment">// 用来过滤掉简单的类型比较，复杂的对象使用 deepEq 函数进行处理</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b);</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>也许你会好奇是不是少了一个 <strong>typeof b !== function</strong>?<br>试想如果我们添加上了这句，当 a 是基本类型，而 b 是函数的时候，就会进入 deepEq 函数，而去掉这一句，就会进入直接进入 false，实际上 基本类型和函数肯定是不会相等的，所以这样做代码又少，又可以让一种情况更早退出。</p>
+<h2 id="String-对象"><a href="#String-对象" class="headerlink" title="String 对象"></a>String 对象</h2><p>现在我们开始写 deepEq 函数，一个要处理的重大难题就是 ‘Curly’ 和 new String(‘Curly’) 如何判断成相等？</p>
+<p>两者的类型都不一样呐！不信我们看 typeof 的操作结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="string">'Curly'</span>); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// object</span></div></pre></td></tr></table></figure></p>
+<p>可是我们还有更多的方法判断类型，比如 Object.prototype.toString：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line">toString.call(<span class="string">'Curly'</span>); <span class="comment">// "[object String]"</span></div><div class="line">toString.call(<span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// "[object String]"</span></div></pre></td></tr></table></figure></p>
+<p>神奇的是使用 toString 方法两者判断的结果却是一致的，可是就算知道了这一点，还是不知道如何判断字符串和字符串包装对象是相等的呢？</p>
+<p>那我们利用隐式类型转换呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'Curly'</span> + <span class="string">''</span> === <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>) + <span class="string">''</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>看来我们已经有了思路：如果 a 和 b 的 Object.prototype.toString的结果一致，并且都是”[object String]”，那我们就使用 ‘’ + a === ‘’ + b 进行判断。</p>
+<p>可是不止有 String 对象呐，Boolean、Number、RegExp、Date呢？</p>
+<h2 id="更多对象"><a href="#更多对象" class="headerlink" title="更多对象"></a>更多对象</h2><p>跟 String 同样的思路，利用隐式类型转换。</p>
+<h3 id="Boolean"><a href="#Boolean" class="headerlink" title="Boolean"></a>Boolean</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="literal">true</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">true</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="RegExp"><a href="#RegExp" class="headerlink" title="RegExp"></a>RegExp</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="regexp">/a/i</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="regexp">/a/i</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">''</span> + a === <span class="string">''</span> + b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="Number"><a href="#Number" class="headerlink" title="Number"></a>Number</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Number</span>(<span class="number">1</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<p>嗯哼？你确定 Number 能这么简单的判断？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>可是 a 和 b 应该被判断成 true 的呐~</p>
+<p>那么我们就改成这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断 Number(NaN) Object(NaN) 等情况</span></div><div class="line">    <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">    <span class="comment">// 其他判断 ...</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<h2 id="deepEq-函数"><a href="#deepEq-函数" class="headerlink" title="deepEq 函数"></a>deepEq 函数</h2><p>现在我们可以写一点 deepEq 函数了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 其他判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="构造函数实例"><a href="#构造函数实例" class="headerlink" title="构造函数实例"></a>构造函数实例</h2><p>我们看个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> Person(<span class="string">'Kevin'</span>);</div><div class="line"><span class="keyword">var</span> animal = <span class="keyword">new</span> Animal(<span class="string">'Kevin'</span>);</div><div class="line"></div><div class="line">eq(person, animal) <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
+<p>虽然 <strong>person</strong> 和 <strong>animal</strong> 都是 <strong>{name: ‘Kevin’}</strong>，但是 <strong>person</strong> 和 <strong>animal</strong> 属于不同构造函数的实例，为了做出区分，我们认为是不同的对象。</p>
+<p>如果两个对象所属的构造函数对象不同，两个对象就一定不相等吗？</p>
+<p>并不一定，我们再举个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> attrs = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line">attrs.name = <span class="string">"Bob"</span>;</div><div class="line">eq(attrs, &#123;<span class="attr">name</span>: <span class="string">"Bob"</span>&#125;); <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
+<p>尽管 <strong>attrs</strong> 没有原型，<strong>{name: “Bob”}</strong> 的构造函数是 <strong>Object</strong>，但是在实际应用中，只要他们有着相同的键值对，我们依然认为是相等。</p>
+<p>从函数设计的角度来看，我们不应该让他们相等，但是从实践的角度，我们让他们相等，所以相等就是一件如此随意的事情吗？！对啊，我也在想：<strong>undersocre</strong>，你怎么能如此随意呢！！！</p>
+<p>哎，吐槽完了，我们还是要接着写这个相等函数，我们可以先做个判断，对于不同构造函数下的实例直接返回 <strong>false</strong>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 接着上面的内容</span></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor, bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 下面还有好多判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="数组相等"><a href="#数组相等" class="headerlink" title="数组相等"></a>数组相等</h2><p>现在终于可以进入我们期待已久的数组和对象的判断，不过其实这个很简单，就是递归遍历一遍……<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 再接着上面的内容</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">         &#125;</div><div class="line">    &#125; </div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a), key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key]))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><p>如果觉得这就结束了，简直是太天真，因为最难的部分才终于要开始，这个问题就是循环引用！</p>
+<p>举个简单的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">b = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">a.abc = a;</div><div class="line">b.abc = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>再复杂一点的，比如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">b = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>为了给大家演示下循环引用，大家可以把下面这段已经精简过的代码复制到浏览器中尝试：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// demo</span></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="comment">// 这是为了让你看到代码其实一直在执行</span></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key])</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>嗯，以上的代码是死循环。</p>
+<p>那么，我们又该如何解决这个问题呢？underscore 的思路是 eq 的时候，多传递两个参数为 aStack 和 bStack，用来储存 a 和 b 递归比较过程中的 a 和 b 的值，咋说的这么绕口呢？<br>我们直接看个精简的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line"></div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">              <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key], aStack, bStack)</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// aStack.pop();</span></div><div class="line">    <span class="comment">// bStack.pop();</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b))</div></pre></td></tr></table></figure></p>
+<p>之所以注释掉 <strong>aStack.pop()</strong>和<strong>bStack.pop()</strong>这两句，是为了方便大家查看 <strong>aStack</strong>  <strong>bStack</strong>的值。</p>
+<h2 id="最终的-eq-函数"><a href="#最终的-eq-函数" class="headerlink" title="最终的 eq 函数"></a>最终的 eq 函数</h2><p>最终的代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// a 和 b 的内部属性 [[class]] 相同时 返回 true</span></div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor,</div><div class="line">            bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="comment">// 检查是否有循环引用的部分</span></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">            <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="comment">// 数组判断</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 对象判断</span></div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a),</div><div class="line">            key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line"></div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key], aStack, bStack))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.pop();</div><div class="line">    bStack.pop();</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="built_in">Number</span>(<span class="literal">NaN</span>), <span class="built_in">Number</span>(<span class="literal">NaN</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="string">'Curly'</span>, <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq([<span class="number">1</span>], [<span class="number">1</span>])); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(&#123; <span class="attr">value</span>: <span class="number">1</span> &#125;, &#123; <span class="attr">value</span>: <span class="number">1</span> &#125;)); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>真让人感叹一句：eq 不愧是 underscore 中实现代码行数最多的函数了！</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/08/HTTP Header 详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/08/08/HTTP Header 详解/" itemprop="url">
+                  HTTP Header 详解
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T00:00:00+08:00">
+                2017-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>HTTP（HyperTextTransferProtocol）即超文本传输协议，目前网页传输的的通用协议。HTTP协议采用了请求/响应模型，浏览器或其他客户端发出请求，服务器给与响应。就整个网络资源传输而言，包括message-header和message-body两部分。首先传递message- header，即http header消息 。http header 消息通常被分为4个部分：general  header, request header, response header, entity header。但是这种分法就理解而言，感觉界限不太明确。根据维基百科对http header内容的组织形式，大体分为Request和Response两部分。</p>
+<h2 id="Requests部分"><a href="#Requests部分" class="headerlink" title="Requests部分"></a>Requests部分</h2><table>
+<thead>
+<tr>
+<th>Header</th>
+<th>解释</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accept</td>
+<td>指定客户端能够接收的内容类型</td>
+<td>Accept: text/plain, text/html</td>
+</tr>
+<tr>
+<td>Accept-Charset</td>
+<td>浏览器可以接受的字符编码集。</td>
+<td>Accept-Charset: iso-8859-5</td>
+</tr>
+<tr>
+<td>Accept-Encoding</td>
+<td>指定浏览器可以支持的web服务器返回内容压缩编码类型。</td>
+<td>Accept-Encoding: compress, gzip</td>
+</tr>
+<tr>
+<td>Accept-Language</td>
+<td>浏览器可接受的语言</td>
+<td>Accept-Language: en,zh</td>
+</tr>
+<tr>
+<td>Accept-Ranges</td>
+<td>可以请求网页实体的一个或者多个子范围字段</td>
+<td>Accept-Ranges: bytes</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>HTTP授权的授权证书</td>
+<td>Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==</td>
+</tr>
+<tr>
+<td>Cache-Control</td>
+<td>指定请求和响应遵循的缓存机制</td>
+<td>Cache-Control: no-cache</td>
+</tr>
+<tr>
+<td>Connection</td>
+<td>表示是否需要持久连接。（HTTP 1.1默认进行持久连接）</td>
+<td>Connection: close</td>
+</tr>
+<tr>
+<td>Cookie</td>
+<td>HTTP请求发送时，会把保存在该请求域名下的所有cookie值一起发送给web服务器。</td>
+<td>Cookie: $Version=1; Skin=new;</td>
+</tr>
+<tr>
+<td>Content-Length</td>
+<td>请求的内容长度</td>
+<td>Content-Length: 348</td>
+</tr>
+<tr>
+<td>Content-Type</td>
+<td>请求的与实体对应的MIME信息</td>
+<td>Content-Type: application/x-www-form-urlencoded</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>请求发送的日期和时间</td>
+<td>Date: Tue, 15 Nov 2010 08:12:31 GMT</td>
+</tr>
+<tr>
+<td>Expect</td>
+<td>请求的特定的服务器行为</td>
+<td>Expect: 100-continue</td>
+</tr>
+<tr>
+<td>From</td>
+<td>发出请求的用户的Email</td>
+<td>From: user@email.com</td>
+</tr>
+<tr>
+<td>Host</td>
+<td>指定请求的服务器的域名和端口号</td>
+<td>Host: www.zcmhi.com</td>
+</tr>
+<tr>
+<td>If-Match</td>
+<td>只有请求内容与实体相匹配才有效</td>
+<td>If-Match: “737060cd8c284d8af7ad3082f209582d”</td>
+</tr>
+<tr>
+<td>If-Modified-Since</td>
+<td>如果请求的部分在指定时间之后被修改则请求成功，未被修改则返回304代码</td>
+<td>If-Modified-Since: Sat, 29 Oct 2010 19:43:31 GMT</td>
+</tr>
+<tr>
+<td>If-None-Match</td>
+<td>如果内容未改变返回304代码，参数为服务器先前发送的Etag，与服务器回应的Etag比较判断是否改变</td>
+<td>If-None-Match: “737060cd8c284d8af7ad3082f209582d”</td>
+</tr>
+<tr>
+<td>If-Range</td>
+<td>如果实体未改变，服务器发送客户端丢失的部分，否则发送整个实体。参数也为Etag</td>
+<td>If-Range: “737060cd8c284d8af7ad3082f209582d”</td>
+</tr>
+<tr>
+<td>If-Unmodified-Since</td>
+<td>只在实体在指定时间之后未被修改才请求成功</td>
+<td>If-Unmodified-Since: Sat, 29 Oct 2010 19:43:31 GMT</td>
+</tr>
+<tr>
+<td>Max-Forwards</td>
+<td>限制信息通过代理和网关传送的时间</td>
+<td>Max-Forwards: 10</td>
+</tr>
+<tr>
+<td>Pragma</td>
+<td>用来包含实现特定的指令</td>
+<td>Pragma: no-cache</td>
+</tr>
+<tr>
+<td>Proxy-Authorization</td>
+<td>连接到代理的授权证书</td>
+<td>Proxy-Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==</td>
+</tr>
+<tr>
+<td>Range</td>
+<td>只请求实体的一部分，指定范围</td>
+<td>Range: bytes=500-999</td>
+</tr>
+<tr>
+<td>Referer</td>
+<td>先前网页的地址，当前请求网页紧随其后,即来路</td>
+<td>Referer: <a href="http://www.zcmhi.com/archives/71.html" target="_blank" rel="external">http://www.zcmhi.com/archives/71.html</a></td>
+</tr>
+<tr>
+<td>TE</td>
+<td>客户端愿意接受的传输编码，并通知服务器接受接受尾加头信息</td>
+<td>TE: trailers,deflate;q=0.5</td>
+</tr>
+<tr>
+<td>Upgrade</td>
+<td>向服务器指定某种传输协议以便服务器进行转换（如果支持）</td>
+<td>Upgrade: HTTP/2.0, SHTTP/1.3, IRC/6.9, RTA/x11</td>
+</tr>
+<tr>
+<td>User-Agent</td>
+<td>User-Agent的内容包含发出请求的用户信息</td>
+<td>User-Agent: Mozilla/5.0 (Linux; X11)</td>
+</tr>
+<tr>
+<td>Via</td>
+<td>通知中间网关或代理服务器地址，通信协议</td>
+<td>Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)</td>
+</tr>
+<tr>
+<td>Warning</td>
+<td>关于消息实体的警告信息</td>
+<td>Warn: 199 Miscellaneous warning</td>
+</tr>
+</tbody>
+</table>
+<h2 id="Responses-部分"><a href="#Responses-部分" class="headerlink" title="Responses 部分"></a>Responses 部分</h2><table>
+<thead>
+<tr>
+<th>Header</th>
+<th>解释</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Accept-Ranges</td>
+<td>表明服务器是否支持指定范围请求及哪种类型的分段请求</td>
+<td>Accept-Ranges: bytes</td>
+</tr>
+<tr>
+<td>Age</td>
+<td>从原始服务器到代理缓存形成的估算时间（以秒计，非负）</td>
+<td>Age: 12</td>
+</tr>
+<tr>
+<td>Allow</td>
+<td>对某网络资源的有效的请求行为，不允许则返回405</td>
+<td>Allow: GET, HEAD</td>
+</tr>
+<tr>
+<td>Cache-Control</td>
+<td>告诉所有的缓存机制是否可以缓存及哪种类型</td>
+<td>Cache-Control: no-cache</td>
+</tr>
+<tr>
+<td>Content-Encoding</td>
+<td>web服务器支持的返回内容压缩编码类型。</td>
+<td>Content-Encoding: gzip</td>
+</tr>
+<tr>
+<td>Content-Language</td>
+<td>响应体的语言</td>
+<td>Content-Language: en,zh</td>
+</tr>
+<tr>
+<td>Content-Length</td>
+<td>响应体的长度</td>
+<td>Content-Length: 348</td>
+</tr>
+<tr>
+<td>Content-Location</td>
+<td>请求资源可替代的备用的另一地址</td>
+<td>Content-Location: /index.htm</td>
+</tr>
+<tr>
+<td>Content-MD5</td>
+<td>返回资源的MD5校验值</td>
+<td>Content-MD5: Q2hlY2sgSW50ZWdyaXR5IQ==</td>
+</tr>
+<tr>
+<td>Content-Range</td>
+<td>在整个返回体中本部分的字节位置</td>
+<td>Content-Range: bytes 21010-47021/47022</td>
+</tr>
+<tr>
+<td>Content-Type</td>
+<td>返回内容的MIME类型</td>
+<td>Content-Type: text/html; charset=utf-8</td>
+</tr>
+<tr>
+<td>Date</td>
+<td>原始服务器消息发出的时间</td>
+<td>Date: Tue, 15 Nov 2010 08:12:31 GMT</td>
+</tr>
+<tr>
+<td>ETag</td>
+<td>请求变量的实体标签的当前值</td>
+<td>ETag: “737060cd8c284d8af7ad3082f209582d”</td>
+</tr>
+<tr>
+<td>Expires</td>
+<td>响应过期的日期和时间</td>
+<td>Expires: Thu, 01 Dec 2010 16:00:00 GMT</td>
+</tr>
+<tr>
+<td>Last-Modified</td>
+<td>请求资源的最后修改时间</td>
+<td>Last-Modified: Tue, 15 Nov 2010 12:45:26 GMT</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>用来重定向接收方到非请求URL的位置来完成请求或标识新的资源</td>
+<td>Location: <a href="http://www.zcmhi.com/archives/94.html" target="_blank" rel="external">http://www.zcmhi.com/archives/94.html</a></td>
+</tr>
+<tr>
+<td>Pragma</td>
+<td>包括实现特定的指令，它可应用到响应链上的任何接收方</td>
+<td>Pragma: no-cache</td>
+</tr>
+<tr>
+<td>Proxy-Authenticate</td>
+<td>它指出认证方案和可应用到代理的该URL上的参数</td>
+<td>Proxy-Authenticate: Basic</td>
+</tr>
+<tr>
+<td>refresh</td>
+<td>应用于重定向或一个新的资源被创造，在5秒之后重定向（由网景提出，被大部分浏览器支持）</td>
+<td>Refresh: 5; url=<a href="http://www.zcmhi.com/archives/94.html" target="_blank" rel="external">http://www.zcmhi.com/archives/94.html</a></td>
+</tr>
+<tr>
+<td>Retry-After</td>
+<td>如果实体暂时不可取，通知客户端在指定时间之后再次尝试</td>
+<td>Retry-After: 120</td>
+</tr>
+<tr>
+<td>Server</td>
+<td>web服务器软件名称</td>
+<td>Server: Apache/1.3.27 (Unix) (Red-Hat/Linux)</td>
+</tr>
+<tr>
+<td>Set-Cookie</td>
+<td>设置Http Cookie</td>
+<td>Set-Cookie: UserID=JohnDoe; Max-Age=3600; Version=1</td>
+</tr>
+<tr>
+<td>Trailer</td>
+<td>指出头域在分块传输编码的尾部存在</td>
+<td>Trailer: Max-Forwards</td>
+</tr>
+<tr>
+<td>Transfer-Encoding</td>
+<td>文件传输编码</td>
+<td>Transfer-Encoding:chunked</td>
+</tr>
+<tr>
+<td>Vary</td>
+<td>告诉下游代理是使用缓存响应还是从原始服务器请求</td>
+<td>Vary: *</td>
+</tr>
+<tr>
+<td>Via</td>
+<td>告知代理客户端响应是通过哪里发送的</td>
+<td>Via: 1.0 fred, 1.1 nowhere.com (Apache/1.1)</td>
+</tr>
+<tr>
+<td>Warning</td>
+<td>警告实体可能存在的问题</td>
+<td>Warning: 199 Miscellaneous warning</td>
+</tr>
+<tr>
+<td>WWW-Authenticate</td>
+<td>表明客户端请求实体应该使用的授权方案</td>
+<td>WWW-Authenticate: Basic</td>
+</tr>
+</tbody>
+</table>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/03/JavaScript的原型及原型链/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/08/03/JavaScript的原型及原型链/" itemprop="url">
+                  JavaScript的原型及原型链
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-03T00:00:00+08:00">
+                2017-08-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在 javascript王国的一次旅行，一个没有类的世界怎么玩转面向对象？ 一文中我们提到了在没有类概念的 JavaScript 语言中是通过原型来实现面向对象的继承特性。只要运用得好，这种基于原型的 JavaScript 继承模型比传统的类继承还要强大。所以我们还需详细学习一下原型的知识</p>
+<h2 id="JavaScript-的对象"><a href="#JavaScript-的对象" class="headerlink" title="JavaScript 的对象"></a>JavaScript 的对象</h2><p>JavaScript 是基于对象的面向对象语言。因此在这里的“对象”既可以是普通对象（Object），也可以是函数对象（Function）。JS 抛弃了 Java 的类概念，而 Java 的继承恰恰是通过类来实现的。那么 JS 没有类的概念，就使用了“原型”的概念来实现继承。</p>
+<h3 id="字面量原型及原型链"><a href="#字面量原型及原型链" class="headerlink" title="字面量原型及原型链"></a>字面量原型及原型链</h3><p>JS 可通过字面量构造对象。为了实现继承，对象里面有个<em>proto</em>属性可以指向该对象的父对象。这个父对象就是所谓的“原型”。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> animal = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'动物'</span>,</div><div class="line">  <span class="attr">eat</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name + <span class="string">" is eating"</span>);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line">animal.eat();     <span class="comment">// animal is eating</span></div><div class="line"><span class="keyword">var</span> dog = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'狗'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line"><span class="keyword">var</span> cat = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'猫'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line">dog.eat();        <span class="comment">// 狗 is eating</span></div><div class="line">cat.eat();        <span class="comment">// 猫 is eating</span></div></pre></td></tr></table></figure>
+<p>由上面代码我们可以看出：dog 和 cat 对象的原型都是 animal。但是 dog 和 cat 对象都没有定义 eat()方法，那怎么可以调用呢？其实当eat方法被调用的时候，先在自己的方法列表中寻找， 如果找不到，就去找原型中的方法， 如果原型中找不到， 就去原型的原型中去寻找…… 最后找到Object那里， 如果还找不到， 那就是未定义了。这几个对象通过<em>proto</em>属性建立一个原型链！<br><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fhwi3i5lirj20gt0f8dif.jpg" alt="image"></p>
+<h2 id="构造函数原型及原型链"><a href="#构造函数原型及原型链" class="headerlink" title="构造函数原型及原型链"></a>构造函数原型及原型链</h2><p>但是为了迁就 C++、Java、C# 程序员，让 JavaScript 可以像 Java 那样 new （构造）出一个对象出来，于是这里做了一个变通，也提供了构造函数。例子如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">function Student(name,grade)&#123;</div><div class="line">  this.name = name;</div><div class="line">  this.grade = grade;</div><div class="line">  this.sayHello = function()&#123;</div><div class="line">    console.log('Hi,I'm ' + this.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">andy = new Student('Andy',5);</div><div class="line">lisa = new Student('Lisa',5);</div><div class="line">andy.sayHello();    //Hi,I'm Andy</div><div class="line">lisa.sayHello();    //Hi,I'm Lisa</div><div class="line">    </div><div class="line">//假设 andy 和 lisa 是同班同学，同时即将升入六年级</div><div class="line">andy.grade = 6;</div><div class="line">console.log(andy.grade);   // 6</div><div class="line">console.log(lisa.grade);   // 5</div></pre></td></tr></table></figure></p>
+<p>由上面的代码所示，我们可以看出这个所谓的构造函数已经很有 Java 类的感觉了。但是这里面存在两个问题：在对象里面定义方法，这样每创建一个对象都会一个sayHello()函数，这样来说显得对象臃肿，浪费资源；同时每个对象各自保有自己的属性和函数的副本，无法做到属性和方法共享。因此，这里有一个更加高效的办法就是把对象共享的属性和方法可以放到 Student.prototype 这个对象当中。如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name</span>)</span>&#123;</div><div class="line">  <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Student.prototype = &#123;</div><div class="line">  <span class="attr">grade</span>: <span class="number">5</span>,</div><div class="line">  <span class="attr">sayHello</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="comment">/*也可以写成</span></div><div class="line">Student.prototype.grade = 5;</div><div class="line">Student.prototype.sayHello = function()&#123;</div><div class="line">  console.log("Hi, I'm "+this.name);</div><div class="line">&#125;;</div><div class="line">*/</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"Andy"</span>);</div><div class="line"><span class="keyword">var</span> lisa = <span class="keyword">new</span> Student(<span class="string">"Lisa"</span>);</div><div class="line">andy.sayHello();      <span class="comment">//Hi, I'm Andy</span></div><div class="line">lisa.sayHello();      <span class="comment">//Hi, I'm Lisa</span></div><div class="line">Student.prototype.grade = <span class="number">6</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Andy's grade: "</span>+ andy.grade);    <span class="comment">// 6</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Lisa's grade: "</span>+ Lisa.grade);    <span class="comment">// 6</span></div></pre></td></tr></table></figure></p>
+<p><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fi6yabvn3vj20rn0ogdhf.jpg" alt="image"><br>由上面的代码和示意图可看出这个所谓的构造函数 Student 其实就是一个幌子啊， 每次去new Student的时候，确实会创建一个对象出来（ andy 或者 lisa ) ， 并且把这个对象的原型指针(<em>proto</em>)指向 Student.prototype 这个对象，这样一来就能找到sayHello()方法了。我们应该还知道上面的构造函数Student()对象（JS 中函数也是对象）会创建一个 prototype 对象（Student.prototype），而 new 出来的实例对象例如 andy 和 lisa 是没有这个 prototype 对象，但是他会有个 proto 属性（<em>proto</em>）指向这个构造函数对象的 prototype 对象，从而构成原型链。实例对象其实是通过原型对象与构造函数取得联系的。为了让 Java、C#、C++ 程序员降低学习成本，JavaScript 提供了语法糖：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(name)&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">  &#125;</div><div class="line">  sayHello()&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"andy"</span>);   </div><div class="line">andy.sayHello();                     <span class="comment">//Hi, I'm andy</span></div></pre></td></tr></table></figure></p>
+<h3 id="Object-create"><a href="#Object-create" class="headerlink" title="Object.create()"></a>Object.create()</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line"><span class="built_in">console</span>.log(a);                 <span class="comment">//&#123;&#125;</span></div><div class="line">a.name = <span class="string">'Zhiyu'</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>.create(a);</div><div class="line"><span class="built_in">console</span>.log(b);                 <span class="comment">//&#123;&#125;</span></div><div class="line"><span class="built_in">console</span>.log(b.name);            <span class="comment">//Zhiyu</span></div></pre></td></tr></table></figure>
+<p>上面我们可以看出该方法是创建一个空对象，空对象的原型是create()参数。此时创建的空对象会有个(<em>proto</em>)属性指向方法参数，这样也可以构成一个原型链。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
+<li>JS 在创建对象（不论是普通对象还是函数对象）的时候，都有一个叫做 _ _proto__ 的内置属性，用于指向创建它的函数对象的原型对象 prototype</li>
+<li>原型和原型链是 JS 实现继承的一种模型</li>
+<li>原型链是靠 proto 形成的，而不是 prototype</li>
+<li>所有的原型对象都有 constructor 属性，该属性对应创建所有指向该原型的实例构造函数</li>
+<li>函数对象和原型对象通过 prototype 和 constructor 属性进行相互关联</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/03/如何监听页面 DOM 变动并高效响应/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -427,143 +1169,6 @@
 <li><a href="http://www.cnblogs.com/fsjohnhuang/p/4147810.html" target="_blank" rel="external">http://www.cnblogs.com/fsjohnhuang/p/4147810.html</a></li>
 <li><a href="http://www.alloyteam.com/2012/11/javascript-throttle/" target="_blank" rel="external">http://www.alloyteam.com/2012/11/javascript-throttle/</a></li>
 </ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/03/JavaScript的原型及原型链/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/08/03/JavaScript的原型及原型链/" itemprop="url">
-                  JavaScript的原型及原型链
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-03T00:00:00+08:00">
-                2017-08-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在 javascript王国的一次旅行，一个没有类的世界怎么玩转面向对象？ 一文中我们提到了在没有类概念的 JavaScript 语言中是通过原型来实现面向对象的继承特性。只要运用得好，这种基于原型的 JavaScript 继承模型比传统的类继承还要强大。所以我们还需详细学习一下原型的知识</p>
-<h2 id="JavaScript-的对象"><a href="#JavaScript-的对象" class="headerlink" title="JavaScript 的对象"></a>JavaScript 的对象</h2><p>JavaScript 是基于对象的面向对象语言。因此在这里的“对象”既可以是普通对象（Object），也可以是函数对象（Function）。JS 抛弃了 Java 的类概念，而 Java 的继承恰恰是通过类来实现的。那么 JS 没有类的概念，就使用了“原型”的概念来实现继承。</p>
-<h3 id="字面量原型及原型链"><a href="#字面量原型及原型链" class="headerlink" title="字面量原型及原型链"></a>字面量原型及原型链</h3><p>JS 可通过字面量构造对象。为了实现继承，对象里面有个<em>proto</em>属性可以指向该对象的父对象。这个父对象就是所谓的“原型”。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> animal = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'动物'</span>,</div><div class="line">  <span class="attr">eat</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="keyword">this</span>.name + <span class="string">" is eating"</span>);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line">animal.eat();     <span class="comment">// animal is eating</span></div><div class="line"><span class="keyword">var</span> dog = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'狗'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line"><span class="keyword">var</span> cat = &#123;</div><div class="line">  <span class="attr">name</span>: <span class="string">'猫'</span>,</div><div class="line">  <span class="attr">_proto_</span>: animal</div><div class="line">&#125;;</div><div class="line">dog.eat();        <span class="comment">// 狗 is eating</span></div><div class="line">cat.eat();        <span class="comment">// 猫 is eating</span></div></pre></td></tr></table></figure>
-<p>由上面代码我们可以看出：dog 和 cat 对象的原型都是 animal。但是 dog 和 cat 对象都没有定义 eat()方法，那怎么可以调用呢？其实当eat方法被调用的时候，先在自己的方法列表中寻找， 如果找不到，就去找原型中的方法， 如果原型中找不到， 就去原型的原型中去寻找…… 最后找到Object那里， 如果还找不到， 那就是未定义了。这几个对象通过<em>proto</em>属性建立一个原型链！<br><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fhwi3i5lirj20gt0f8dif.jpg" alt="image"></p>
-<h2 id="构造函数原型及原型链"><a href="#构造函数原型及原型链" class="headerlink" title="构造函数原型及原型链"></a>构造函数原型及原型链</h2><p>但是为了迁就 C++、Java、C# 程序员，让 JavaScript 可以像 Java 那样 new （构造）出一个对象出来，于是这里做了一个变通，也提供了构造函数。例子如下：<br><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">function Student(name,grade)&#123;</div><div class="line">  this.name = name;</div><div class="line">  this.grade = grade;</div><div class="line">  this.sayHello = function()&#123;</div><div class="line">    console.log('Hi,I'm ' + this.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line">andy = new Student('Andy',5);</div><div class="line">lisa = new Student('Lisa',5);</div><div class="line">andy.sayHello();    //Hi,I'm Andy</div><div class="line">lisa.sayHello();    //Hi,I'm Lisa</div><div class="line">    </div><div class="line">//假设 andy 和 lisa 是同班同学，同时即将升入六年级</div><div class="line">andy.grade = 6;</div><div class="line">console.log(andy.grade);   // 6</div><div class="line">console.log(lisa.grade);   // 5</div></pre></td></tr></table></figure></p>
-<p>由上面的代码所示，我们可以看出这个所谓的构造函数已经很有 Java 类的感觉了。但是这里面存在两个问题：在对象里面定义方法，这样每创建一个对象都会一个sayHello()函数，这样来说显得对象臃肿，浪费资源；同时每个对象各自保有自己的属性和函数的副本，无法做到属性和方法共享。因此，这里有一个更加高效的办法就是把对象共享的属性和方法可以放到 Student.prototype 这个对象当中。如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Student</span>(<span class="params">name</span>)</span>&#123;</div><div class="line">  <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line">Student.prototype = &#123;</div><div class="line">  <span class="attr">grade</span>: <span class="number">5</span>,</div><div class="line">  <span class="attr">sayHello</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;;</div><div class="line"><span class="comment">/*也可以写成</span></div><div class="line">Student.prototype.grade = 5;</div><div class="line">Student.prototype.sayHello = function()&#123;</div><div class="line">  console.log("Hi, I'm "+this.name);</div><div class="line">&#125;;</div><div class="line">*/</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"Andy"</span>);</div><div class="line"><span class="keyword">var</span> lisa = <span class="keyword">new</span> Student(<span class="string">"Lisa"</span>);</div><div class="line">andy.sayHello();      <span class="comment">//Hi, I'm Andy</span></div><div class="line">lisa.sayHello();      <span class="comment">//Hi, I'm Lisa</span></div><div class="line">Student.prototype.grade = <span class="number">6</span>;</div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Andy's grade: "</span>+ andy.grade);    <span class="comment">// 6</span></div><div class="line"><span class="built_in">console</span>.log(<span class="string">"Lisa's grade: "</span>+ Lisa.grade);    <span class="comment">// 6</span></div></pre></td></tr></table></figure></p>
-<p><img src="http://ww1.sinaimg.cn/large/7b6c9535gy1fi6yabvn3vj20rn0ogdhf.jpg" alt="image"><br>由上面的代码和示意图可看出这个所谓的构造函数 Student 其实就是一个幌子啊， 每次去new Student的时候，确实会创建一个对象出来（ andy 或者 lisa ) ， 并且把这个对象的原型指针(<em>proto</em>)指向 Student.prototype 这个对象，这样一来就能找到sayHello()方法了。我们应该还知道上面的构造函数Student()对象（JS 中函数也是对象）会创建一个 prototype 对象（Student.prototype），而 new 出来的实例对象例如 andy 和 lisa 是没有这个 prototype 对象，但是他会有个 proto 属性（<em>proto</em>）指向这个构造函数对象的 prototype 对象，从而构成原型链。实例对象其实是通过原型对象与构造函数取得联系的。为了让 Java、C#、C++ 程序员降低学习成本，JavaScript 提供了语法糖：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">Student</span> </span>&#123;</div><div class="line">  <span class="keyword">constructor</span>(name)&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">  &#125;</div><div class="line">  sayHello()&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Hi, I'm "</span>+<span class="keyword">this</span>.name);</div><div class="line">  &#125;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> andy = <span class="keyword">new</span> Student(<span class="string">"andy"</span>);   </div><div class="line">andy.sayHello();                     <span class="comment">//Hi, I'm andy</span></div></pre></td></tr></table></figure></p>
-<h3 id="Object-create"><a href="#Object-create" class="headerlink" title="Object.create()"></a>Object.create()</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line"><span class="built_in">console</span>.log(a);                 <span class="comment">//&#123;&#125;</span></div><div class="line">a.name = <span class="string">'Zhiyu'</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Object</span>.create(a);</div><div class="line"><span class="built_in">console</span>.log(b);                 <span class="comment">//&#123;&#125;</span></div><div class="line"><span class="built_in">console</span>.log(b.name);            <span class="comment">//Zhiyu</span></div></pre></td></tr></table></figure>
-<p>上面我们可以看出该方法是创建一个空对象，空对象的原型是create()参数。此时创建的空对象会有个(<em>proto</em>)属性指向方法参数，这样也可以构成一个原型链。</p>
-<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
-<li>JS 在创建对象（不论是普通对象还是函数对象）的时候，都有一个叫做 _ _proto__ 的内置属性，用于指向创建它的函数对象的原型对象 prototype</li>
-<li>原型和原型链是 JS 实现继承的一种模型</li>
-<li>原型链是靠 proto 形成的，而不是 prototype</li>
-<li>所有的原型对象都有 constructor 属性，该属性对应创建所有指向该原型的实例构造函数</li>
-<li>函数对象和原型对象通过 prototype 和 constructor 属性进行相互关联</li>
-</ol>
 
           
         
@@ -1237,171 +1842,6 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/09/react为什么需要key/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/09/react为什么需要key/" itemprop="url">
-                  react为什么需要key
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-09T00:00:00+08:00">
-                2017-07-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="多个react组件性能优化"><a href="#多个react组件性能优化" class="headerlink" title="多个react组件性能优化"></a>多个react组件性能优化</h2><h3 id="1-1-生命周期"><a href="#1-1-生命周期" class="headerlink" title="1.1 生命周期"></a>1.1 生命周期</h3><ol>
-<li><p>当一个react组件被装载、更新和卸载时，组件的一系列生命周期函数会被调用。不过这些生命周期函数是针对某一个特定的react组件的函数，在一个应用中，从上到下有很多react组件组合起来，它们之间的渲染过程更加复杂。</p>
-</li>
-<li><p>其中，装载阶段基本上没有什么选择，当一个react组件第一次出现在DOM树中时，无论如何都是要彻底渲染一次的，从这个react组件往下的所有子组件，都要经历一遍react组件的装载生命周期，因为这部分的的工作没有什么可以省略的，所以没有多少性能优化的事情可以做。</p>
-</li>
-<li><p>至于卸载阶段，只有一个生命周期函数 <strong>componentWillUnmount</strong>，这个函数做的事情知识清理 <strong>componentDidMount</strong> 添加的事件处理监听等收尾工作，做的事情比装载过程要少很多，所以也没什么可以优化的空间。</p>
-</li>
-<li><p>所以值得关注的过程，就只剩下了更新过程。</p>
-</li>
-</ol>
-<h3 id="1-2-react的调和-reconciliation-过程"><a href="#1-2-react的调和-reconciliation-过程" class="headerlink" title="1.2 react的调和(reconciliation)过程"></a>1.2 react的调和(reconciliation)过程</h3><p>react在更新阶段很巧妙地对比原有的 <strong>Virtual DOM</strong> 和新生成的 <strong>Virtual DOM</strong> ,找出两者的不同之处，根据不同来修改DOM树，这样只需要做做小的必要改动。react在更新这个“找不同”的过程，就叫做(reconciliation)过程。</p>
-<h3 id="1-3-react的算法时间复杂度"><a href="#1-3-react的算法时间复杂度" class="headerlink" title="1.3 react的算法时间复杂度"></a>1.3 react的算法时间复杂度</h3><ol>
-<li>Facebook推出的react之初打出的旗号之一就是“高性能”，所以react的(reconciliation)过程必须快速。但是，找出两个树形结构的区别，从计算机科学的角度来说，真的不是一件快速的事。</li>
-<li>按照计算机科学目前的算法研究结果，对比两个N个节点的树形结构的算法，时间复杂度是 <strong>O(N^3)</strong>,打个比方，假如两个树形结构上各有100节点，那么找出这两个树形结构差别的操作，需要100*100*100次操作，也就是一百万次当量的操作，假如有一千个节点，那么需要相当于1000*1000*1000次操作，这是一亿次的操作当量，这么巨大数量的操作在强调快速反应的网页中是不可想象的，所以react不可能采用这样的算法。</li>
-<li>react实际采用的算法需要的时间复杂度是 <strong>O(N)</strong> ，因为对比两个树形怎么着都要对比两个树形上的节点，似乎也不可能有比 <strong>O(N)</strong> 时间复杂度更低的算法。react采用的算法肯定不是最精准的，但是对于react英语的场景来说，绝对是性能和复杂度的最好折衷，让这个算法发挥作用，还需要开发者一点配合。</li>
-<li>其实，react的reconciliation算法并不是很复杂，当react要对比两个 <strong>Virtual DOM</strong> 的树形结构的时候，从根节点开始递归往下比对，在树形结构上，每个阶段都可以看做一个这个阶段以下部分子树的根节点。所以其实这个对比算法可以从 <strong>Virtual DOM</strong> 上任何一个节点开始执行。</li>
-</ol>
-<h3 id="1-4-react检查两个树形结构的根节点的不同处理方式"><a href="#1-4-react检查两个树形结构的根节点的不同处理方式" class="headerlink" title="1.4 react检查两个树形结构的根节点的不同处理方式"></a>1.4 react检查两个树形结构的根节点的不同处理方式</h3><ol>
-<li>节点类型不同的情况</li>
-</ol>
-<p>如果树形结构的根节点类型不相同，那就意味着改动太大了，也不需要去费心考虑是不是原来那个树形的根节点被移动到其他地方去了，直接认为原来那个树形结构会已经没用，可以扔掉，需要重新构建新的DOM树，原有的树形结构上的react组件都会经历“卸载”的生命周期。也就是，对于 <strong>Virtual DOM</strong> 树这是一个“更新”的过程，但是却可能引发这个树形结构上某些组件的“装载”和“卸载”过程。例如，在更新之前，组件的结构是这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>我们想要更新成这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;span&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>那么react会认为要废掉之前的div节点，包括下面的所有的子节点，一切推到重新来，重新构建一个span节点以及其子节点。看似浪费，但是为了避免 <strong>O(N^3)</strong> 的时间复杂度，react必须要选一个更简单更快的算法，也就只能用这种方式。</p>
-<p>作为开发者，很显然要避免作为包裹功能的节点类型被随意改变。</p>
-<ol>
-<li>节点类型相同的情况</li>
-</ol>
-<p>如果两个树形结构的根节点类型相同，react就会认为原来的根节点只需要更新过程，不会将其卸载，也不会引发根节点的重新装载。这时候要区分一下节点类型。节点可以分为两类：一类是DOM元素类型对应的就是HTML直接支持的元素类型，比如div,span,p。另一类是react组件，也就是利用react库订制的类型。</p>
-<p>对于DOM类型，react会保留节点对应的DOM元素，支队树形结构根节点上的树形和内容做一下对比，然后只更新修改的部分。<br>比如原来的jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;red&quot;,fontSize:16&#125;&#125; className=&quot;welcome&quot;&gt;</div><div class="line">    hello</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
-<p>改变后jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;green&quot;,fontSize:16&#125;&#125; className=&quot;farewell&quot;&gt;</div><div class="line">    good bye</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
-<p>这两个的差别就是颜色和className发生了改变，在操作DOM树节点的时候，只修改这些发生变化的部分，让DOM操作尽可能少。</p>
-<p>如果树形结构的根节点不是DOM元素类型，react所做的工作类似，只是react不知道如何去更新DOM树，因为这些逻辑还在react组件之中，react能做的只是根据新节点的props去更新原来根节点的组件实例，引发这个组件的实例的更新过程。也就会触发react更新阶段的生命周期函数，这个过程中，如果 <strong>shouldComponentUpdate</strong> 返回false。更新就会停止。</p>
-<ol>
-<li>多个子组件的情况</li>
-</ol>
-<p>当一个组件包含多个子组件的情况，react的处理方式也非常简单的直接。例如最初组件形态用jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>更新之后，jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;third&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>这种情况react的更新过程，只要 <strong>shouldComponentUpdate</strong> 使用恰当，可以避免实质性的更新操作。</p>
-<p>但是，在序列前面增加一个 TodoItem实例的时候。需要更新后的形态jsx表示为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>这种情况下，react会首先认为把text为first的组件实例的text改为zero，text为second的组件实例的text改为first，最后增加一个一个实例，text为second。这种情况下，<strong>shouldComponentUpdate</strong> 也无法判断是否返回false。想要增加一个组件实例，却引发了另外两个组件的更新。</p>
-<p>这种情况，react的key就凸显出作用了。react通过这个key就能判断每一个组件在组件序列中的位置了。</p>
-<p>上面的情况变为，最初形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>新增组件的时候,形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;0&#125; text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>react就知道把组件插在组件序列的第一位了。对原有的两个组件，只用props来启用更新过程，_shouldComponentUpdate__ 就能根据key来判断是否返回false来中断更新了，避免无用的更新操作了。</p>
-<h3 id="1-5-总结"><a href="#1-5-总结" class="headerlink" title="1.5 总结"></a>1.5 总结</h3><p>所以，碰到数组-&gt;列表的映射，或是同级元素需要移位的情况，一定要给元素加上key属性！</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/09/知识点整理 - 前端涉及的各种像素概念以及 viewport 汇总/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1694,7 +2134,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/05/D3.js学习笔记：简单条形图制作/">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/09/react为什么需要key/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="赖宝">
@@ -1716,8 +2156,8 @@
             
               
                 
-                <a class="post-title-link" href="/2017/07/05/D3.js学习笔记：简单条形图制作/" itemprop="url">
-                  D3.js学习笔记：简单条形图制作
+                <a class="post-title-link" href="/2017/07/09/react为什么需要key/" itemprop="url">
+                  react为什么需要key
                 </a>
               
             
@@ -1733,8 +2173,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-05T00:00:00+08:00">
-                2017-07-05
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-09T00:00:00+08:00">
+                2017-07-09
               </time>
             
 
@@ -1771,184 +2211,51 @@
       
         
           
-            <p><strong>D3简介</strong>：D3.js is a JavaScript library for manipulating documents based on data. D3 helps you bring data to life using HTML, SVG and CSS. D3’s emphasis on web standards gives you the full capabilities of modern browsers without tying yourself to a proprietary framework, combining powerful visualization components and a data-driven approach to DOM manipulation.</p>
-<hr>
-<h2 id="一、元素选择"><a href="#一、元素选择" class="headerlink" title="一、元素选择"></a>一、元素选择</h2><p>平常的程序如下所示：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">var div = document.createElement("div");</div><div class="line">div.innerHTML = "Hello, world!";</div><div class="line">document.body.appendChild(div);</div></pre></td></tr></table></figure>
-<p>通过使用D3.js的selector程序如下所示（网页全代码）：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://d3js.org/d3.v3.min.js"</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"></div><div class="line"><span class="keyword">var</span> body = d3.select(<span class="string">"body"</span>);</div><div class="line"><span class="keyword">var</span> div = body.append(<span class="string">"div"</span>);</div><div class="line">div.html(<span class="string">"Hello, world!"</span>);</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">body</span>&gt;</span></div></pre></td></tr></table></figure>
-<p>其中，d3.select的元素body可以替换成其他很多元素。</p>
-<hr>
-<h2 id="二、变换方法"><a href="#二、变换方法" class="headerlink" title="二、变换方法"></a>二、变换方法</h2><p>selection.attr返回当前的选择内容，selection.append返回一个新内容。以下为一些示例：</p>
-<ul>
-<li>改变body样式</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> body = d3.select(<span class="string">"body"</span>);</div><div class="line">body.style(<span class="string">"color"</span>, <span class="string">"black"</span>);</div><div class="line">body.style(<span class="string">"background-color"</span>, <span class="string">"white"</span>);</div></pre></td></tr></table></figure>
-<ul>
-<li>添加一个新div（section需在样式表中提前定义）</li>
-</ul>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">d3.selectAll(<span class="string">"section"</span>)</div><div class="line">	.attr(<span class="string">"class"</span>, <span class="string">"special"</span>)</div><div class="line">  .append(<span class="string">"div"</span>)</div><div class="line">	.html(<span class="string">"Hello, world!"</span>);</div></pre></td></tr></table></figure>
-<hr>
-<h2 id="三、手动码表"><a href="#三、手动码表" class="headerlink" title="三、手动码表"></a>三、手动码表</h2><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></div><div class="line"></div><div class="line">.chart div &#123;</div><div class="line">  font: 10px sans-serif;</div><div class="line">  background-color: steelblue;</div><div class="line">  text-align: right;</div><div class="line">  padding: 3px;</div><div class="line">  margin: 1px;</div><div class="line">  color: white;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"chart"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 40px;"</span>&gt;</span>4<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 80px;"</span>&gt;</span>8<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 150px;"</span>&gt;</span>15<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 160px;"</span>&gt;</span>16<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 230px;"</span>&gt;</span>23<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">div</span> <span class="attr">style</span>=<span class="string">"width: 420px;"</span>&gt;</span>42<span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure>
-<hr>
-<h2 id="四、自动码表"><a href="#四、自动码表" class="headerlink" title="四、自动码表"></a>四、自动码表</h2><p>假设我们已经定义了chart的样式，则代码如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">d3.select(<span class="string">".chart"</span>)</div><div class="line">  .selectAll(<span class="string">"div"</span>)</div><div class="line">	.data(data)</div><div class="line">  .enter().append(<span class="string">"div"</span>)</div><div class="line">	.style(<span class="string">"width"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d * <span class="number">10</span> + <span class="string">"px"</span>; &#125;)</div><div class="line">	.text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d; &#125;);</div></pre></td></tr></table></figure>
-<p>select是选中chart块，而selectAll是选中chart中的已有和之后可能有的div块，data是用于数据绑定，enter().append()是为现在不存在的元素增加div块，style是设置显示长度，text是设置显示文字内容。</p>
-<p>为了让条形图的长度适合，我们可以定下一个范围，让数据根据自身大小自行处理。x轴的长度设置如下所示：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> x = d3.scale.linear()</div><div class="line">	.domain([<span class="number">0</span>, d3.max(data)])</div><div class="line">	.range([<span class="number">0</span>, <span class="number">420</span>]);</div></pre></td></tr></table></figure>
-<p>自动填补长度的代码如下：</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">d3.select(<span class="string">".chart"</span>)</div><div class="line">  .selectAll(<span class="string">"div"</span>)</div><div class="line">	.data(data)</div><div class="line">  .enter().append(<span class="string">"div"</span>)</div><div class="line">	.style(<span class="string">"width"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> x(d) + <span class="string">"px"</span>; &#125;)</div><div class="line">	.text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d; &#125;);</div></pre></td></tr></table></figure>
-<p>总代码如下：</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&lt;!DOCTYPE html&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">meta</span> <span class="attr">charset</span>=<span class="string">"utf-8"</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">style</span>&gt;</span><span class="undefined"></span></div><div class="line"></div><div class="line">.chart div &#123;</div><div class="line">  font: 10px sans-serif;</div><div class="line">  background-color: steelblue;</div><div class="line">  text-align: right;</div><div class="line">  padding: 3px;</div><div class="line">  margin: 1px;</div><div class="line">  color: white;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">style</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"chart"</span>&gt;</span><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">"http://d3js.org/d3.v3.min.js"</span>&gt;</span><span class="undefined"></span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">script</span>&gt;</span><span class="javascript"></span></div><div class="line"></div><div class="line"><span class="keyword">var</span> data = [<span class="number">4</span>, <span class="number">8</span>, <span class="number">15</span>, <span class="number">16</span>, <span class="number">23</span>, <span class="number">42</span>];</div><div class="line"></div><div class="line"><span class="keyword">var</span> x = d3.scale.linear()</div><div class="line">	.domain([<span class="number">0</span>, d3.max(data)])</div><div class="line">	.range([<span class="number">0</span>, <span class="number">420</span>]);</div><div class="line"></div><div class="line">d3.select(<span class="string">".chart"</span>)</div><div class="line">  .selectAll(<span class="string">"div"</span>)</div><div class="line">	.data(data)</div><div class="line">  .enter().append(<span class="string">"div"</span>)</div><div class="line">	.style(<span class="string">"width"</span>, <span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> x(d) + <span class="string">"px"</span>; &#125;)</div><div class="line">	.text(<span class="function"><span class="keyword">function</span>(<span class="params">d</span>) </span>&#123; <span class="keyword">return</span> d; &#125;);</div><div class="line"></div><div class="line"><span class="tag">&lt;/<span class="name">script</span>&gt;</span></div></pre></td></tr></table></figure>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/03/动手实现一个简单的浏览器端js模块加载器/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/03/动手实现一个简单的浏览器端js模块加载器/" itemprop="url">
-                  动手实现一个简单的浏览器端js模块加载器
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-03T00:00:00+08:00">
-                2017-07-03
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>在es6之前，js不像其他语言自带成熟的模块化功能，页面只能靠插入一个个script标签来引入自己的或第三方的脚本，并且容易带来命名冲突的问题。js社区做了很多努力，在当时的运行环境中，实现”模块”的效果。<br>通用的js模块化标准有CommonJS与AMD，前者运用于node环境，后者在浏览器环境中由Require.js等实现。此外还有国内的开源项目Sea.js，遵循CMD规范。（目前随着es6的普及已经停止维护，不论是AMD还是CMD，都将是一段历史了）</p>
-<h3 id="浏览器端js加载器"><a href="#浏览器端js加载器" class="headerlink" title="浏览器端js加载器"></a>浏览器端js加载器</h3><p>实现一个简单的js加载器并不复杂，主要可以分为 <strong>解析路径、下载模块、解析模块依赖、解析模块</strong> 四个步骤。<br>首先定义一下模块。在各种规范中，通常一个js文件即表示一个模块。那么，我们可以在模块文件中，构造一个闭包，并传出一个对象，作为模块的导出：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">define(factory() &#123;</div><div class="line">    <span class="keyword">var</span> x = &#123;</div><div class="line">        <span class="attr">a</span>: <span class="number">1</span></div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> x;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>define函数接收一个工厂函数参数，浏览器执行该脚本时，define函数执行factory，并把它的return值存储在加载器的模块对象modules里。<br>如何 <strong>标识</strong> 一个模块呢？可以用文件的 <strong>uri</strong>，它是唯一标识，是天然的id。<br>文件路径path有几种形式：</p>
-<p>绝对路径：<a href="http://xxx" target="_blank" rel="external">http://xxx</a>, file://xxx</p>
-<p>相对路径：./xxx ， ../xxx ， xxx(相对当前页面的文件路径)</p>
-<p>虚拟绝对路径：/xxx /表示网站根目录<br>因此，需要一个resolvePath函数来将不同形式的path解析成uri，参照当前页面的文件路径来解析。</p>
-<p>接着，假设我们需要引用a.js与b.js两个模块，并设置了需要a与b才能执行的回调函数f。我们希望加载器去拉取a与b，当a与b都加载完成后，从modules里取出a与b作为参数传给f，执行下一步操作。这里可以用观察者模式（即订阅/发布模式）实现，创建一个eventProxy，订阅加载a与加载b事件；define函数执行到最后，已经把导出挂载modules里之后，emit一个本模块加载完成的事件，eventProxy收到后检查a与b是否都加载完成，如果完成，就传参给f执行回调。</p>
-<p>同理，eventProxy也可以实现模块依赖加载<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line">define([ <span class="string">'c.js'</span>, <span class="string">'d.js'</span> ], factory (c, d) &#123;</div><div class="line">    <span class="keyword">var</span> x = c + d;</div><div class="line">    <span class="keyword">return</span> x;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>define函数的第一个参数可以传入一个依赖数组，表示a模块依赖c与d。define执行时，告诉eventProxy订阅c与d加载事件，加载好了就执行回调函数f存储a的导出，并emit事件a已加载。</p>
-<p>浏览器端加载脚本的原始方法是插入一个 <strong>script</strong> 标签，指定src之后，浏览器开始下载该脚本。<br>那么加载器中的模块加载可以用dom操作实现，插入一个script标签并指定src，此时该模块为下载中状态。<br>PS：浏览器中，动态插入script标签与初次加载页面dom时的script加载方式不同：</p>
-<p>初次加载页面，浏览器会从上到下顺序解析dom，碰到script标签时，下载脚本并阻塞dom解析，等到该脚本下载、执行完毕后再继续解析之后的dom（现代浏览器做了preload优化，会预先下载好多个脚本，但执行顺序与它们在dom中顺序一致，执行时阻塞其他dom解析）</p>
-<p>动态插入script，<strong>var a = document.createElement(‘script’); a.src=’xxx’; document.body.appendChild(a)</strong>;浏览器会在该脚本下载完成后执行，过程是异步的。</p>
-<p>下载完成后执行上述的操作，解析依赖-&gt;加载依赖-&gt;解析本模块-&gt;加载完成-&gt;执行回调。</p>
-<p>模块下载完成后，如何在解析它时知道它的uri呢？有两种发发，一种是用 <strong>srcipt.onload</strong> 获取 <strong>this</strong> 对象的src属性；一种是在define函数中采用 <strong>document.currentScript.src</strong>。</p>
-<p>实现基本的功能比较简单，代码不到200行：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div><div class="line">142</div><div class="line">143</div><div class="line">144</div><div class="line">145</div><div class="line">146</div><div class="line">147</div><div class="line">148</div><div class="line">149</div><div class="line">150</div><div class="line">151</div><div class="line">152</div><div class="line">153</div><div class="line">154</div><div class="line">155</div><div class="line">156</div><div class="line">157</div><div class="line">158</div><div class="line">159</div><div class="line">160</div><div class="line">161</div><div class="line">162</div><div class="line">163</div><div class="line">164</div><div class="line">165</div><div class="line">166</div><div class="line">167</div><div class="line">168</div><div class="line">169</div><div class="line">170</div><div class="line">171</div><div class="line">172</div><div class="line">173</div><div class="line">174</div><div class="line">175</div><div class="line">176</div><div class="line">177</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> zmm = &#123;</div><div class="line">    <span class="attr">_modules</span>: &#123;&#125;,</div><div class="line">    <span class="attr">_configs</span>: &#123;</div><div class="line">        <span class="comment">// 用于拼接相对路径</span></div><div class="line">        basePath: (<span class="function"><span class="keyword">function</span> (<span class="params">path</span>) </span>&#123;</div><div class="line">            <span class="keyword">if</span> (path.charAt(path.length - <span class="number">1</span>) === <span class="string">'/'</span>) &#123;</div><div class="line">                path = path.substr(<span class="number">0</span>, path.length - <span class="number">1</span>);</div><div class="line">            &#125;</div><div class="line">            <span class="keyword">return</span> path.substr(path.indexOf(location.host) + location.host.length + <span class="number">1</span>);</div><div class="line">        &#125;)(location.href),</div><div class="line">        <span class="comment">// 用于拼接相对根路径</span></div><div class="line">        host: location.protocol + <span class="string">'//'</span> + location.host + <span class="string">'/'</span></div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.hasModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断是否已有该模块，不论加载中或已加载好</span></div><div class="line">    <span class="keyword">return</span> <span class="keyword">this</span>._modules.hasOwnProperty(_uri);</div><div class="line">&#125;;</div><div class="line">zmm.isModuleLoaded = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断该模块是否已加载好</span></div><div class="line">    <span class="keyword">return</span> !!<span class="keyword">this</span>._modules[_uri];</div><div class="line">&#125;;</div><div class="line">zmm.pushModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">    <span class="comment">// 新模块占坑，但此时还未加载完成，表示加载中；防止重复加载</span></div><div class="line">    <span class="keyword">if</span> (!<span class="keyword">this</span>._modules.hasOwnProperty(_uri)) &#123;</div><div class="line">        <span class="keyword">this</span>._modules[_uri] = <span class="literal">null</span>;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line">zmm.installModule = <span class="function"><span class="keyword">function</span> (<span class="params">_uri, mod</span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>._modules[_uri] = mod;</div><div class="line">&#125;;</div><div class="line">zmm.load = <span class="function"><span class="keyword">function</span> (<span class="params">uris</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i, nsc;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; uris.length; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.hasModule(uris[i])) &#123;</div><div class="line">            <span class="keyword">this</span>.pushModule(uris[i]);</div><div class="line">            <span class="comment">// 开始加载</span></div><div class="line">            <span class="keyword">var</span> nsc = <span class="built_in">document</span>.createElement(<span class="string">'script'</span>);</div><div class="line">                nsc.src = uri;</div><div class="line">            <span class="built_in">document</span>.body.appendChild(nsc);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.resolvePath = <span class="function"><span class="keyword">function</span> (<span class="params">path</span>) </span>&#123;</div><div class="line">    <span class="comment">// 返回绝对路径</span></div><div class="line">    <span class="keyword">var</span> res = <span class="string">''</span>, paths = [], resPaths;</div><div class="line">    <span class="keyword">if</span> (path.match(<span class="regexp">/.*:\/\/.*/</span>)) &#123;</div><div class="line">        <span class="comment">// 绝对路径</span></div><div class="line">        res = path.match(<span class="regexp">/.*:\/\/.*?\//</span>)[<span class="number">0</span>]; <span class="comment">// 协议+域名</span></div><div class="line">        path = path.substr(res.length);</div><div class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (path.charAt(<span class="number">0</span>) === <span class="string">'/'</span>) &#123;</div><div class="line">        <span class="comment">// 相对根路径 /开头</span></div><div class="line">        res = <span class="keyword">this</span>._configs.host;</div><div class="line">        path = path.substr(<span class="number">1</span>);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 相对路径 ./或../开头或直接文件名</span></div><div class="line">        res = <span class="keyword">this</span>._configs.host;</div><div class="line">        resPaths = <span class="keyword">this</span>._configs.basePath.split(<span class="string">'/'</span>);</div><div class="line">    &#125;</div><div class="line">    resPaths = resPaths || [];</div><div class="line">    paths = path.split(<span class="string">'/'</span>);</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; paths.length; i++) &#123;</div><div class="line">        <span class="keyword">if</span> (paths[i] === <span class="string">'..'</span>) &#123;</div><div class="line">            resPaths.pop();</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (paths[i] === <span class="string">'.'</span>) &#123;</div><div class="line">            <span class="comment">// do nothing</span></div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            resPaths.push(paths[i]);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    res += resPaths.join(<span class="string">'/'</span>);</div><div class="line">    <span class="keyword">return</span> res;</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">var</span> define = zmm.define = <span class="function"><span class="keyword">function</span> (<span class="params">dependPaths, fac</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> _uri = <span class="built_in">document</span>.currentScript.src;</div><div class="line">    <span class="keyword">if</span> (zmm.isModuleLoaded(_uri)) &#123;</div><div class="line">        <span class="keyword">return</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">var</span> factory, depPaths, uris = [];</div><div class="line">    <span class="keyword">if</span> (<span class="built_in">arguments</span>.length === <span class="number">1</span>) &#123;</div><div class="line">        factory = <span class="built_in">arguments</span>[<span class="number">0</span>];</div><div class="line">        <span class="comment">// 挂载到模块组中</span></div><div class="line">        zmm.installModule(_uri, factory());</div><div class="line">        <span class="comment">// 告诉proxy该模块已装载好</span></div><div class="line">        zmm.proxy.emit(_uri);</div><div class="line">    &#125; <span class="keyword">else</span> &#123;</div><div class="line">        <span class="comment">// 有依赖的情况</span></div><div class="line">        factory = <span class="built_in">arguments</span>[<span class="number">1</span>];</div><div class="line">        <span class="comment">// 装载完成的回调函数</span></div><div class="line">        zmm.use(<span class="built_in">arguments</span>[<span class="number">0</span>], <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">            zmm.installModule(_uri, factory.apply(<span class="literal">null</span>, <span class="built_in">arguments</span>));</div><div class="line">            zmm.proxy.emit(_uri);</div><div class="line">        &#125;);</div><div class="line">    &#125;</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.use = <span class="function"><span class="keyword">function</span> (<span class="params">paths, callback</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (!<span class="built_in">Array</span>.isArray(paths)) &#123;</div><div class="line">        paths = [paths];</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">var</span> uris = [], i;</div><div class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; paths.length; i++) &#123;</div><div class="line">        uris.push(<span class="keyword">this</span>.resolvePath(paths[i]));</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 先注册事件，再加载</span></div><div class="line">    <span class="keyword">this</span>.proxy.watch(uris, callback);</div><div class="line">    <span class="keyword">this</span>.load(uris);</div><div class="line">&#125;;</div><div class="line"></div><div class="line">zmm.proxy = <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> proxy = &#123;&#125;;</div><div class="line">    <span class="keyword">var</span> taskId = <span class="number">0</span>;</div><div class="line">    <span class="keyword">var</span> taskList = &#123;&#125;;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> execute = <span class="function"><span class="keyword">function</span> (<span class="params">task</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> uris = task.uris,</div><div class="line">            callback = task.callback;</div><div class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, arr = []; i &lt; uris.length; i++) &#123;</div><div class="line">            arr.push(zmm._modules[uris[i]]);</div><div class="line">        &#125;</div><div class="line">        callback.apply(<span class="literal">null</span>, arr);</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">var</span> deal_loaded = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> i, k, task, sum;</div><div class="line">        <span class="comment">// 当一个模块加载完成时，遍历当前任务栈</span></div><div class="line">        <span class="keyword">for</span> (k <span class="keyword">in</span> taskList) &#123;</div><div class="line">            <span class="keyword">if</span> (!taskList.hasOwnProperty(k)) &#123;</div><div class="line">                <span class="keyword">continue</span>;</div><div class="line">            &#125;</div><div class="line">            task = taskList[k];</div><div class="line">            <span class="keyword">if</span> (task.uris.indexOf(_uri) &gt; <span class="number">-1</span>) &#123;</div><div class="line">                <span class="comment">// 查看这个任务中的模块是否都已加载好</span></div><div class="line">                <span class="keyword">for</span> (i = <span class="number">0</span>, sum = <span class="number">0</span>; i &lt; task.uris.length; i++) &#123;</div><div class="line">                    <span class="keyword">if</span> (zmm.isModuleLoaded(task.uris[i])) &#123;</div><div class="line">                        sum ++;</div><div class="line">                    &#125;</div><div class="line">                &#125;</div><div class="line">                <span class="keyword">if</span> (sum === task.uris.length) &#123;</div><div class="line">                    <span class="comment">// 都加载完成 删除任务</span></div><div class="line">                    <span class="keyword">delete</span>(taskList[k]);</div><div class="line">                    execute(task);</div><div class="line">                &#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line"></div><div class="line">    proxy.watch = <span class="function"><span class="keyword">function</span> (<span class="params">uris, callback</span>) </span>&#123;</div><div class="line">        <span class="comment">// 先检查一遍是否都加载好了</span></div><div class="line">        <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>, sum = <span class="number">0</span>; i &lt; uris.length; i++) &#123;</div><div class="line">            <span class="keyword">if</span> (zmm.isModuleLoaded(uris[i])) &#123;</div><div class="line">                sum ++;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">if</span> (sum === uris.length) &#123;</div><div class="line">            execute(&#123;</div><div class="line">                <span class="attr">uris</span>: uris,</div><div class="line">                <span class="attr">callback</span>: callback</div><div class="line">            &#125;);</div><div class="line">        &#125; <span class="keyword">else</span> &#123;</div><div class="line">            <span class="comment">// 订阅新加载任务</span></div><div class="line">            <span class="keyword">var</span> task = &#123;</div><div class="line">                <span class="attr">uris</span>: uris,</div><div class="line">                <span class="attr">callback</span>: callback</div><div class="line">            &#125;;</div><div class="line">            taskList[<span class="string">''</span> + taskId] = task;</div><div class="line">            taskId ++;</div><div class="line">        &#125;</div><div class="line">    &#125;;</div><div class="line">    proxy.emit = <span class="function"><span class="keyword">function</span> (<span class="params">_uri</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(_uri + <span class="string">' is loaded!'</span>);</div><div class="line">        deal_loaded(_uri);</div><div class="line">    &#125;;</div><div class="line">    <span class="keyword">return</span> proxy;</div><div class="line">&#125;();</div></pre></td></tr></table></figure></p>
-<h2 id="循环依赖问题"><a href="#循环依赖问题" class="headerlink" title="循环依赖问题"></a>循环依赖问题</h2><p>“循环加载”指的是，a脚本的执行依赖b脚本，而b脚本的执行又依赖a脚本。这是一种应该尽量避免的设计。</p>
-<h3 id="浏览器端"><a href="#浏览器端" class="headerlink" title="浏览器端"></a>浏览器端</h3><p>用上面的zmm工具加载模块a:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// main.html</span></div><div class="line">zmm.use(<span class="string">'/a.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;...&#125;);</div><div class="line"><span class="comment">// a.js</span></div><div class="line">define(<span class="string">'/b.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">b</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line">  a = b + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> a;</div><div class="line">&#125;);</div><div class="line"><span class="comment">// b.js</span></div><div class="line">define(<span class="string">'/a.js'</span>, <span class="function"><span class="keyword">function</span>(<span class="params">a</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line">  <span class="keyword">return</span> b;</div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>就会陷入a等待b加载完成、b等待a加载完成的死锁状态。sea.js碰到这种情况也是死锁，也许是默认这种行为不应该出现。<br>seajs里可以通过require.async来缓解循环依赖的问题，但必须改写a.js：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line">define(<span class="string">'./js/a'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">require, exports, module</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line">  <span class="built_in">require</span>.async(<span class="string">'./b'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">b</span>) </span>&#123;</div><div class="line">      a = b + <span class="number">1</span>;</div><div class="line">      <span class="built_in">module</span>.exports = a; <span class="comment">//a= 3</span></div><div class="line">  &#125;);</div><div class="line">  <span class="built_in">module</span>.exports = a; <span class="comment">// a= 1</span></div><div class="line">&#125;);</div><div class="line"><span class="comment">// b.js</span></div><div class="line">define(<span class="string">'./js/b'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">require, exports, module</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line">  <span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line">  <span class="built_in">module</span>.exports = b;</div><div class="line">&#125;);</div><div class="line"><span class="comment">// main.html</span></div><div class="line">seajs.use(<span class="string">'./js/a'</span>, <span class="function"><span class="keyword">function</span> (<span class="params">a</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(a);  <span class="comment">// 1</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure></p>
-<p>但这么做a就必须先知道b会依赖自己，且use中输出的是b还没加载时a的值，use并不知道a的值之后还会改变。<br>在浏览器端，似乎没有很好的解决方案。node模块加载碰到的循环依赖问题则小得多。</p>
-<h3 id="node-CommonJS"><a href="#node-CommonJS" class="headerlink" title="node/CommonJS"></a>node/CommonJS</h3><p>CommonJS模块的重要特性是加载时执行，即脚本代码在require的时候，就会全部执行。CommonJS的做法是，一旦出现某个模块被”循环加载”，就只输出已经执行的部分，还未执行的部分不会输出。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// a.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = a;</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">require</span>(<span class="string">'./b'</span>);</div><div class="line">a = b + <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = a;</div><div class="line"><span class="comment">// b.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line"><span class="keyword">var</span> b = a + <span class="number">1</span>;</div><div class="line"><span class="built_in">module</span>.exports = b;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">var</span> a = <span class="built_in">require</span>(<span class="string">'./a'</span>);</div><div class="line"><span class="built_in">console</span>.log(a); <span class="comment">//3</span></div></pre></td></tr></table></figure></p>
-<p>上面main.js的代码中，先加载模块a，执行require函数，此时内存中已经挂了一个模块a，它的exports为一个空对象a.exports={}；接着执行a.js中的代码；执行var b = require(‘./b’);之前，a.exports=1，接着执行require(b)；b.js被执行时，拿到的是a.exports=1，b加载完成后，执行权回到a.js；最后a模块的输出为3。</p>
-<p>CommonJS与浏览器端的加载器有着实现上的差异。node加载的模块都是在本地，执行的是同步的加载过程，即按依赖关系依次加载，执行到加载语句就去加载另一个模块，加载完了再回到函数调用点继续执行；浏览器端加载scripts由于天生限制，只能采取异步加载，执行回调来实现。</p>
-<h3 id="ES6"><a href="#ES6" class="headerlink" title="ES6"></a>ES6</h3><p>ES6模块的运行机制与CommonJS不一样，它遇到模块加载命令import时，不会去执行模块，而是只生成一个引用。等到真的需要用到时，再到模块里面去取值。因此，ES6模块是动态引用，不存在缓存值的问题，而且模块里面的变量，绑定其所在的模块。</p>
-<p>这导致ES6处理”循环加载”与CommonJS有本质的不同。ES6根本不会关心是否发生了”循环加载”，只是生成一个指向被加载模块的引用，需要开发者自己保证，真正取值的时候能够取到值。</p>
-<p>来看一个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// even.js</span></div><div class="line"><span class="keyword">import</span> &#123; odd &#125; <span class="keyword">from</span> <span class="string">'./odd'</span>;</div><div class="line"><span class="keyword">export</span> <span class="keyword">var</span> counter = <span class="number">0</span>;</div><div class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">even</span>(<span class="params">n</span>) </span>&#123; counter++; <span class="keyword">return</span> n == <span class="number">0</span> || odd(n - <span class="number">1</span>);&#125;</div><div class="line"><span class="comment">// odd.js</span></div><div class="line"><span class="keyword">import</span> &#123; even &#125; <span class="keyword">from</span> <span class="string">'./even'</span>;</div><div class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">odd</span>(<span class="params">n</span>) </span>&#123; <span class="keyword">return</span> n != <span class="number">0</span> &amp;&amp; even(n - <span class="number">1</span>);&#125;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">import</span> * <span class="keyword">as</span> m <span class="keyword">from</span> <span class="string">'./even.js'</span>;</div><div class="line">m.even(<span class="number">10</span>); <span class="comment">// true; m.counter = 6</span></div></pre></td></tr></table></figure></p>
-<p>上面代码中，even.js里面的函数even有一个参数n，只要不等于0，就会减去1，传入加载的odd()。odd.js也会做类似作。</p>
-<p>上面代码中，参数n从10变为0的过程中，foo()一共会执行6次，所以变量counter等于6。第二次调用even（）时，参数n从20变为0，foo()一共会执行11次，加上前面的6次，所以变量counter等于17。</p>
-<p>而这个例子要是改写成CommonJS，就根本无法执行，会报错。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// even.js</span></div><div class="line"><span class="keyword">var</span> odd = <span class="built_in">require</span>(<span class="string">'./odd'</span>);</div><div class="line"><span class="keyword">var</span> counter = <span class="number">0</span>;</div><div class="line">exports.counter = counter;</div><div class="line">exports.even = <span class="function"><span class="keyword">function</span>(<span class="params">n</span>) </span>&#123;</div><div class="line">counter++;</div><div class="line"><span class="keyword">return</span> n == <span class="number">0</span> || odd(n - <span class="number">1</span>);</div><div class="line">&#125;</div><div class="line"><span class="comment">// odd.js</span></div><div class="line"><span class="keyword">var</span> even = <span class="built_in">require</span>(<span class="string">'./even'</span>).even;</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span>(<span class="params">n</span>) </span>&#123;</div><div class="line"><span class="keyword">return</span> n != <span class="number">0</span> &amp;&amp; even(n - <span class="number">1</span>);</div><div class="line">&#125;</div><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">var</span> m = <span class="built_in">require</span>(<span class="string">'./even'</span>);</div><div class="line">m.even(<span class="number">10</span>); <span class="comment">// TypeError: even is not a function</span></div></pre></td></tr></table></figure></p>
-<p>上面代码中，even.js加载odd.js，而odd.js又去加载even.js，形成”循环加载”。这时，执行引擎就会输出even.js已经执行的部分（不存在任何结果），所以在odd.js之中，变量even等于null，等到后面调用even(n-1)就会报错。</p>
+            <h2 id="多个react组件性能优化"><a href="#多个react组件性能优化" class="headerlink" title="多个react组件性能优化"></a>多个react组件性能优化</h2><h3 id="1-1-生命周期"><a href="#1-1-生命周期" class="headerlink" title="1.1 生命周期"></a>1.1 生命周期</h3><ol>
+<li><p>当一个react组件被装载、更新和卸载时，组件的一系列生命周期函数会被调用。不过这些生命周期函数是针对某一个特定的react组件的函数，在一个应用中，从上到下有很多react组件组合起来，它们之间的渲染过程更加复杂。</p>
+</li>
+<li><p>其中，装载阶段基本上没有什么选择，当一个react组件第一次出现在DOM树中时，无论如何都是要彻底渲染一次的，从这个react组件往下的所有子组件，都要经历一遍react组件的装载生命周期，因为这部分的的工作没有什么可以省略的，所以没有多少性能优化的事情可以做。</p>
+</li>
+<li><p>至于卸载阶段，只有一个生命周期函数 <strong>componentWillUnmount</strong>，这个函数做的事情知识清理 <strong>componentDidMount</strong> 添加的事件处理监听等收尾工作，做的事情比装载过程要少很多，所以也没什么可以优化的空间。</p>
+</li>
+<li><p>所以值得关注的过程，就只剩下了更新过程。</p>
+</li>
+</ol>
+<h3 id="1-2-react的调和-reconciliation-过程"><a href="#1-2-react的调和-reconciliation-过程" class="headerlink" title="1.2 react的调和(reconciliation)过程"></a>1.2 react的调和(reconciliation)过程</h3><p>react在更新阶段很巧妙地对比原有的 <strong>Virtual DOM</strong> 和新生成的 <strong>Virtual DOM</strong> ,找出两者的不同之处，根据不同来修改DOM树，这样只需要做做小的必要改动。react在更新这个“找不同”的过程，就叫做(reconciliation)过程。</p>
+<h3 id="1-3-react的算法时间复杂度"><a href="#1-3-react的算法时间复杂度" class="headerlink" title="1.3 react的算法时间复杂度"></a>1.3 react的算法时间复杂度</h3><ol>
+<li>Facebook推出的react之初打出的旗号之一就是“高性能”，所以react的(reconciliation)过程必须快速。但是，找出两个树形结构的区别，从计算机科学的角度来说，真的不是一件快速的事。</li>
+<li>按照计算机科学目前的算法研究结果，对比两个N个节点的树形结构的算法，时间复杂度是 <strong>O(N^3)</strong>,打个比方，假如两个树形结构上各有100节点，那么找出这两个树形结构差别的操作，需要100*100*100次操作，也就是一百万次当量的操作，假如有一千个节点，那么需要相当于1000*1000*1000次操作，这是一亿次的操作当量，这么巨大数量的操作在强调快速反应的网页中是不可想象的，所以react不可能采用这样的算法。</li>
+<li>react实际采用的算法需要的时间复杂度是 <strong>O(N)</strong> ，因为对比两个树形怎么着都要对比两个树形上的节点，似乎也不可能有比 <strong>O(N)</strong> 时间复杂度更低的算法。react采用的算法肯定不是最精准的，但是对于react英语的场景来说，绝对是性能和复杂度的最好折衷，让这个算法发挥作用，还需要开发者一点配合。</li>
+<li>其实，react的reconciliation算法并不是很复杂，当react要对比两个 <strong>Virtual DOM</strong> 的树形结构的时候，从根节点开始递归往下比对，在树形结构上，每个阶段都可以看做一个这个阶段以下部分子树的根节点。所以其实这个对比算法可以从 <strong>Virtual DOM</strong> 上任何一个节点开始执行。</li>
+</ol>
+<h3 id="1-4-react检查两个树形结构的根节点的不同处理方式"><a href="#1-4-react检查两个树形结构的根节点的不同处理方式" class="headerlink" title="1.4 react检查两个树形结构的根节点的不同处理方式"></a>1.4 react检查两个树形结构的根节点的不同处理方式</h3><ol>
+<li>节点类型不同的情况</li>
+</ol>
+<p>如果树形结构的根节点类型不相同，那就意味着改动太大了，也不需要去费心考虑是不是原来那个树形的根节点被移动到其他地方去了，直接认为原来那个树形结构会已经没用，可以扔掉，需要重新构建新的DOM树，原有的树形结构上的react组件都会经历“卸载”的生命周期。也就是，对于 <strong>Virtual DOM</strong> 树这是一个“更新”的过程，但是却可能引发这个树形结构上某些组件的“装载”和“卸载”过程。例如，在更新之前，组件的结构是这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>我们想要更新成这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;span&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<p>那么react会认为要废掉之前的div节点，包括下面的所有的子节点，一切推到重新来，重新构建一个span节点以及其子节点。看似浪费，但是为了避免 <strong>O(N^3)</strong> 的时间复杂度，react必须要选一个更简单更快的算法，也就只能用这种方式。</p>
+<p>作为开发者，很显然要避免作为包裹功能的节点类型被随意改变。</p>
+<ol>
+<li>节点类型相同的情况</li>
+</ol>
+<p>如果两个树形结构的根节点类型相同，react就会认为原来的根节点只需要更新过程，不会将其卸载，也不会引发根节点的重新装载。这时候要区分一下节点类型。节点可以分为两类：一类是DOM元素类型对应的就是HTML直接支持的元素类型，比如div,span,p。另一类是react组件，也就是利用react库订制的类型。</p>
+<p>对于DOM类型，react会保留节点对应的DOM元素，支队树形结构根节点上的树形和内容做一下对比，然后只更新修改的部分。<br>比如原来的jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;red&quot;,fontSize:16&#125;&#125; className=&quot;welcome&quot;&gt;</div><div class="line">    hello</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
+<p>改变后jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;green&quot;,fontSize:16&#125;&#125; className=&quot;farewell&quot;&gt;</div><div class="line">    good bye</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
+<p>这两个的差别就是颜色和className发生了改变，在操作DOM树节点的时候，只修改这些发生变化的部分，让DOM操作尽可能少。</p>
+<p>如果树形结构的根节点不是DOM元素类型，react所做的工作类似，只是react不知道如何去更新DOM树，因为这些逻辑还在react组件之中，react能做的只是根据新节点的props去更新原来根节点的组件实例，引发这个组件的实例的更新过程。也就会触发react更新阶段的生命周期函数，这个过程中，如果 <strong>shouldComponentUpdate</strong> 返回false。更新就会停止。</p>
+<ol>
+<li>多个子组件的情况</li>
+</ol>
+<p>当一个组件包含多个子组件的情况，react的处理方式也非常简单的直接。例如最初组件形态用jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
+<p>更新之后，jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;third&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
+<p>这种情况react的更新过程，只要 <strong>shouldComponentUpdate</strong> 使用恰当，可以避免实质性的更新操作。</p>
+<p>但是，在序列前面增加一个 TodoItem实例的时候。需要更新后的形态jsx表示为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
+<p>这种情况下，react会首先认为把text为first的组件实例的text改为zero，text为second的组件实例的text改为first，最后增加一个一个实例，text为second。这种情况下，<strong>shouldComponentUpdate</strong> 也无法判断是否返回false。想要增加一个组件实例，却引发了另外两个组件的更新。</p>
+<p>这种情况，react的key就凸显出作用了。react通过这个key就能判断每一个组件在组件序列中的位置了。</p>
+<p>上面的情况变为，最初形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
+<p>新增组件的时候,形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;0&#125; text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
+<p>react就知道把组件插在组件序列的第一位了。对原有的两个组件，只用props来启用更新过程，_shouldComponentUpdate__ 就能根据key来判断是否返回false来中断更新了，避免无用的更新操作了。</p>
+<h3 id="1-5-总结"><a href="#1-5-总结" class="headerlink" title="1.5 总结"></a>1.5 总结</h3><p>所以，碰到数组-&gt;列表的映射，或是同级元素需要移位的情况，一定要给元素加上key属性！</p>
 
           
         
@@ -1987,7 +2294,7 @@
 
   
   <nav class="pagination">
-    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
+    <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><a class="extend next" rel="next" href="/page/2/"><i class="fa fa-angle-right"></i></a>
   </nav>
 
 
@@ -2032,32 +2339,14 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">21</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
           
 
           
-            
-            
-            <div class="site-state-item site-state-categories">
-              
-                <span class="site-state-item-count">2</span>
-                <span class="site-state-item-name">分类</span>
-              
-            </div>
-          
 
-          
-            
-            
-            <div class="site-state-item site-state-tags">
-              
-                <span class="site-state-item-count">17</span>
-                <span class="site-state-item-name">标签</span>
-              
-            </div>
           
 
         </nav>
