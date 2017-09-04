@@ -250,6 +250,143 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/05/20/JavaScript面向对象系列：一、类型/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/05/20/JavaScript面向对象系列：一、类型/" itemprop="url">
+                  JavaScript面向对象系列：一、类型
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-20T00:00:00+08:00">
+                2017-05-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="js有5中原始类型-Boolean-number-string-null-undefined，所有原始类型的值都有字面形式。字面形式是不被保存在变量中的值。"><a href="#js有5中原始类型-Boolean-number-string-null-undefined，所有原始类型的值都有字面形式。字面形式是不被保存在变量中的值。" class="headerlink" title="js有5中原始类型 Boolean number string null undefined，所有原始类型的值都有字面形式。字面形式是不被保存在变量中的值。"></a>js有5中原始类型 Boolean number string null undefined，所有原始类型的值都有字面形式。字面形式是不被保存在变量中的值。</h2><h2 id="js和其他许多语言一样，原始类型的变量直接保存原始值（而不是一个指向对象的指针）。当你将原始值赋值给一个变量时，改值将被赋值到变量中。也是就说，如果你使一个变量等于另一个变量时，每一个变量都有它自己的一份数据拷贝-例如"><a href="#js和其他许多语言一样，原始类型的变量直接保存原始值（而不是一个指向对象的指针）。当你将原始值赋值给一个变量时，改值将被赋值到变量中。也是就说，如果你使一个变量等于另一个变量时，每一个变量都有它自己的一份数据拷贝-例如" class="headerlink" title="js和其他许多语言一样，原始类型的变量直接保存原始值（而不是一个指向对象的指针）。当你将原始值赋值给一个变量时，改值将被赋值到变量中。也是就说，如果你使一个变量等于另一个变量时，每一个变量都有它自己的一份数据拷贝.例如"></a>js和其他许多语言一样，原始类型的变量直接保存原始值（而不是一个指向对象的指针）。当你将原始值赋值给一个变量时，改值将被赋值到变量中。也是就说，如果你使一个变量等于另一个变量时，每一个变量都有它自己的一份数据拷贝.例如</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> color1 = <span class="string">"red"</span>;</div><div class="line"><span class="keyword">var</span> color2 = color1;</div></pre></td></tr></table></figure>
+<h2 id="每个含有原始变量的变量使用自己的存储空间，一个变量的改变不会影响到其他变量"><a href="#每个含有原始变量的变量使用自己的存储空间，一个变量的改变不会影响到其他变量" class="headerlink" title="每个含有原始变量的变量使用自己的存储空间，一个变量的改变不会影响到其他变量."></a>每个含有原始变量的变量使用自己的存储空间，一个变量的改变不会影响到其他变量.</h2><h2 id="虽然字符串、数字和布尔值是原始类型，但是他们也拥有方法（null和undefined没有方法）"><a href="#虽然字符串、数字和布尔值是原始类型，但是他们也拥有方法（null和undefined没有方法）" class="headerlink" title="虽然字符串、数字和布尔值是原始类型，但是他们也拥有方法（null和undefined没有方法）."></a>虽然字符串、数字和布尔值是原始类型，但是他们也拥有方法（null和undefined没有方法）.</h2><h2 id="尽管原始类型拥有方法，但是他们不是对象，js使他们看上起像对象一样，以此来提供语言上的一致性体验。"><a href="#尽管原始类型拥有方法，但是他们不是对象，js使他们看上起像对象一样，以此来提供语言上的一致性体验。" class="headerlink" title="尽管原始类型拥有方法，但是他们不是对象，js使他们看上起像对象一样，以此来提供语言上的一致性体验。"></a>尽管原始类型拥有方法，但是他们不是对象，js使他们看上起像对象一样，以此来提供语言上的一致性体验。</h2><h2 id="引用类型是指js中的对象，同时也是在语言中能找到的最接近类的东西。引用值就是引用类型的实例，也是对象的同义词。对象是属性的无序列表。"><a href="#引用类型是指js中的对象，同时也是在语言中能找到的最接近类的东西。引用值就是引用类型的实例，也是对象的同义词。对象是属性的无序列表。" class="headerlink" title="引用类型是指js中的对象，同时也是在语言中能找到的最接近类的东西。引用值就是引用类型的实例，也是对象的同义词。对象是属性的无序列表。"></a>引用类型是指js中的对象，同时也是在语言中能找到的最接近类的东西。引用值就是引用类型的实例，也是对象的同义词。对象是属性的无序列表。</h2><h2 id="当你将一个对象赋值给变量时，实际是赋值给这个变量一个指针。将一个变量赋值给另一个变量时，两个变量各获得了一份指针的拷贝，指向内存中的一个对象。"><a href="#当你将一个对象赋值给变量时，实际是赋值给这个变量一个指针。将一个变量赋值给另一个变量时，两个变量各获得了一份指针的拷贝，指向内存中的一个对象。" class="headerlink" title="当你将一个对象赋值给变量时，实际是赋值给这个变量一个指针。将一个变量赋值给另一个变量时，两个变量各获得了一份指针的拷贝，指向内存中的一个对象。"></a>当你将一个对象赋值给变量时，实际是赋值给这个变量一个指针。将一个变量赋值给另一个变量时，两个变量各获得了一份指针的拷贝，指向内存中的一个对象。</h2><h2 id="js语言有垃圾收集功能，因此当你使用引用类型时无需担心内存分配。但是最好在不使用对象时将其引用解除，让垃圾收集器对那块内存进行释放。解除引用的最佳手段是将对象变量设置为null。"><a href="#js语言有垃圾收集功能，因此当你使用引用类型时无需担心内存分配。但是最好在不使用对象时将其引用解除，让垃圾收集器对那块内存进行释放。解除引用的最佳手段是将对象变量设置为null。" class="headerlink" title="js语言有垃圾收集功能，因此当你使用引用类型时无需担心内存分配。但是最好在不使用对象时将其引用解除，让垃圾收集器对那块内存进行释放。解除引用的最佳手段是将对象变量设置为null。"></a>js语言有垃圾收集功能，因此当你使用引用类型时无需担心内存分配。但是最好在不使用对象时将其引用解除，让垃圾收集器对那块内存进行释放。解除引用的最佳手段是将对象变量设置为null。</h2><h2 id="js内建类型-Array-Date-Error-Function-Object-RegExp"><a href="#js内建类型-Array-Date-Error-Function-Object-RegExp" class="headerlink" title="js内建类型 Array Date Error Function Object RegExp"></a>js内建类型 Array Date Error Function Object RegExp</h2><h2 id="鉴别引用类型，对于函数，typeof-返回的是-funcion-但是其他引用类型的返回都是object-其他的引用类型可以使用instanceof来鉴别。"><a href="#鉴别引用类型，对于函数，typeof-返回的是-funcion-但是其他引用类型的返回都是object-其他的引用类型可以使用instanceof来鉴别。" class="headerlink" title="鉴别引用类型，对于函数，typeof 返回的是 funcion,但是其他引用类型的返回都是object.其他的引用类型可以使用instanceof来鉴别。"></a>鉴别引用类型，对于函数，typeof 返回的是 funcion,但是其他引用类型的返回都是object.其他的引用类型可以使用instanceof来鉴别。</h2><h2 id="es5引入Array-isArray-item-来鉴别数组"><a href="#es5引入Array-isArray-item-来鉴别数组" class="headerlink" title="es5引入Array.isArray(item)来鉴别数组"></a>es5引入Array.isArray(item)来鉴别数组</h2><h2 id="原始封装类型共有三种，String，Number，Boolean。这些特殊引用类型的存在使得原始类型用起来和对象一样方便。"><a href="#原始封装类型共有三种，String，Number，Boolean。这些特殊引用类型的存在使得原始类型用起来和对象一样方便。" class="headerlink" title="原始封装类型共有三种，String，Number，Boolean。这些特殊引用类型的存在使得原始类型用起来和对象一样方便。"></a>原始封装类型共有三种，String，Number，Boolean。这些特殊引用类型的存在使得原始类型用起来和对象一样方便。</h2><h2 id="字符串对象的存在仅用于该语句并在随后被销毁。"><a href="#字符串对象的存在仅用于该语句并在随后被销毁。" class="headerlink" title="字符串对象的存在仅用于该语句并在随后被销毁。"></a>字符串对象的存在仅用于该语句并在随后被销毁。</h2><p>例如：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> name = <span class="string">"aaaa"</span>;</div><div class="line">name.last = <span class="string">"bbbb"</span></div><div class="line"><span class="built_in">console</span>.log(name.last);  <span class="comment">//undefined</span></div></pre></td></tr></table></figure>
+<p>下面是实际在js引擎中实际发生的事</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> name  = <span class="string">"aaaa"</span>;</div><div class="line"><span class="keyword">var</span> temp = <span class="keyword">new</span> <span class="built_in">String</span>(name);</div><div class="line">temp.last = <span class="string">"bbbb"</span>;</div><div class="line">temp = <span class="literal">null</span>;</div><div class="line"><span class="keyword">var</span> temp = <span class="keyword">new</span> <span class="built_in">String</span>(name);</div><div class="line"><span class="built_in">console</span>.log(temp);  <span class="comment">//undefined</span></div><div class="line">temp = <span class="literal">null</span></div></pre></td></tr></table></figure>
+<p>实际上是在一个立刻就被销毁的临时对象上而不是字符串上添加了新的属性。之后当你试图访问该属性时，另一个不同的临时对象被创建，而新属性并不存在。虽然原始封装类型会被自动创建，在这些值上进行instanceof检查对应类型的返回值却都是false。</p>
+<p>例如</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> name = <span class="string">"aaa"</span>;</div><div class="line"><span class="keyword">var</span> count = <span class="number">10</span>;</div><div class="line"><span class="keyword">var</span> found = <span class="literal">false</span>;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(name <span class="keyword">instanceof</span> <span class="built_in">String</span>); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(count <span class="keyword">instanceof</span> <span class="built_in">Number</span>); <span class="comment">//false</span></div><div class="line"><span class="built_in">console</span>.log(found <span class="keyword">instanceof</span> <span class="built_in">Boolean</span>); <span class="comment">//false</span></div></pre></td></tr></table></figure>
+<p>这是因为临时对象仅在值被读取时被创建。instanceof操作符并没有真的读取任何东西，也就是没有临时对象的创建，于是它告诉我们这些值并不属于原始封装类型。<br>你也可以手动创建原始封装类型，但是有某些副作用</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> name = <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">"aaa"</span>);</div><div class="line"><span class="keyword">var</span> count = <span class="keyword">new</span> <span class="built_in">Number</span>(<span class="number">10</span>);</div><div class="line"><span class="keyword">var</span> found = <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">false</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> name); <span class="comment">//"object"</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> count); <span class="comment">//"object"</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> found); <span class="comment">//"object"</span></div></pre></td></tr></table></figure>
+<p>手动创建原始封装类型实际会创建出一个object，这意味着typeof无法手动鉴别出你实际保存的数据类型</p>
+<h2 id="一个对象在条件判断语句中总被认为是true，无论该对象的值是不是等于false。"><a href="#一个对象在条件判断语句中总被认为是true，无论该对象的值是不是等于false。" class="headerlink" title="一个对象在条件判断语句中总被认为是true，无论该对象的值是不是等于false。"></a>一个对象在条件判断语句中总被认为是true，无论该对象的值是不是等于false。</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> found =  <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">false</span>);</div><div class="line"><span class="keyword">if</span>(found)&#123;</div><div class="line">    <span class="built_in">console</span>.log(<span class="string">"Found"</span>)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">//结果执行了，"Found"</span></div></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><pre><code>javascript中虽然没有类，但是有类型。每个变量或数据都有一个对应的原始类型或者引用类型。5种原始类型（字符串、数字、布尔值、空类型、未定义）的值会被直接保存在变量对象中。除了空类型，都可以用typeof来鉴别。空类型必须直接跟null进行比较才能鉴别。
+
+引用类型是js中最接近类的东西，而对象则是引用类型的实例。可以使用new操作符或者字面量的形式创建新对象。通常可以用点号访问属性和方法，也可以用中括号。函数在js中也是对象，可以使用typeof来鉴别他们。至于其他引用类型，你应该用instanceof和一个构造函数来鉴别。
+
+为了让原始类型看上去更像引用类型，js提供了三种原始封装类型：String、Number、Boolean。js会在背后创建这些对象是的你能够像使用普通对象那样直接使用原始值，但是这些临时对象在使用它们的语句结束时就立刻被销毁。虽然你也可以自己创建原始封装类型的实例，但是它们太容易令人误解，所以最好别这么干。
+</code></pre>
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/05/05/我们为什么需要redux/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -428,7 +565,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">21</span>
+                <span class="site-state-item-count">22</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
