@@ -399,174 +399,6 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/正向代理和反向代理/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/09/05/正向代理和反向代理/" itemprop="url">
-                  正向代理和反向代理
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
-                2017-09-05
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="正向代理和反向代理"><a href="#正向代理和反向代理" class="headerlink" title="正向代理和反向代理"></a>正向代理和反向代理</h1><p>最开始使用nginx相当懵，不清楚他的工作原理，最近在网上看了些相关资料，整理一下，方便理解和学习，首先从正向代理和反向代理开始。看了不少文章讲的都很绕，看了还是很晕，下面是知乎上的一篇文章，是我看过讲的比较清楚的一篇了。</p>
-<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>1 正向代理</p>
-<p>正向代理是一个位于客户端和目标服务器之间的代理服务器(中间服务器)。为了从原始服务器取得内容，客户端向代理服务器发送一个请求，并且指定目标服务器，之后代理向目标服务器转交并且将获得的内容返回给客户端。正向代理的情况下客户端必须要进行一些特别的设置才能使用。</p>
-<p>2 反向代理</p>
-<p>反向代理正好相反。对于客户端来说，反向代理就好像目标服务器。并且客户端不需要进行任何设置。客户端向反向代理发送请求，接着反向代理判断请求走向何处，并将请求转交给客户端，使得这些内容就好似他自己一样，一次客户端并不会感知到反向代理后面的服务，也因此不需要客户端做任何设置，只需要把反向代理服务器当成真正的服务器就好了。</p>
-<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>正向代理需要你主动设置代理服务器ip或者域名进行访问，由设置的服务器ip或者域名去获取访问内容并返回；而反向代理不需要你做任何设置，直接访问服务器真实ip或者域名，但是服务器内部会自动根据访问内容进行跳转及内容返回，你不知道它最终访问的是哪些机器。</p>
-<p>正向代理是代理客户端，为客户端收发请求，使真实客户端对服务器不可见；而反向代理是代理服务器端，为服务器收发请求，使真实服务器对客户端不可见。</p>
-<p>从上面的描述也能看得出来正向代理和反向代理最关键的两点区别：</p>
-<ul>
-<li>是否指定目标服务器</li>
-<li>客户端是否要做设置</li>
-</ul>
-<p>下面用一张图来表示两者的差异：</p>
-<p><img src="http://eden.dz11.com/xupload/xupload_1501912275000.jpeg" alt="剪贴板图片"></p>
-<p>正向代理中，proxy和client同属一个LAN，对server透明； 反向代理中，proxy和server同属一个LAN，对client透明。 实际上proxy在两种代理中做的事都是代为收发请求和响应，不过从结构上来看正好左右互换了下，所以把前者那种代理方式叫做正向代理，后者叫做反向代理。</p>
-<p>从用途上来区分：</p>
-<ul>
-<li>正向代理：正向代理用途是为了在防火墙内的局域网提供访问internet的途径。另外还可以使用缓冲特性减少网络使用率</li>
-<li>反向代理：反向代理的用途是将防火墙后面的服务器提供给internet用户访问。同时还可以完成诸如负载均衡等功能</li>
-</ul>
-<p>从安全性来讲：</p>
-<ul>
-<li>正向代理：正向代理允许客户端通过它访问任意网站并且隐蔽客户端自身，因此你必须采取安全措施来确保仅为经过授权的客户端提供服务</li>
-<li>反向代理：对外是透明的，访问者并不知道自己访问的是代理。对访问者而言，他以为访问的就是原始服务器</li>
-</ul>
-<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。</p>
-<p>1 从上面的介绍也就可以猜出来正向代理的至少一个功能（俗称翻墙），也即：用户A无法访问facebook，但是能访问服务器B，而服务器B可以访问facebook。于是用户A访问服务器B，通过服务器B去访问facebook，，服务器B收到请求后，去访问facebook，facebook把响应信息返回给服务器B，服务器B再把响应信息返回给A。这样，通过代理服务器B，就实现了翻墙。</p>
-<p>2 从上面的介绍也可以猜出来反向代理的至少一个功能（比如负载均衡），也即：假设用户A访问 www.somesite.com/something.html，但www.somesite.com’上并不存在something.html页面，于是接收用户请求的该服务器就偷偷从另外一台服务器上取回来，然后返回给用户，而用户并不知道something.html页面究竟位于哪台机器上。</p>
-<p>3 反向代理的作用就比较多了，这里简单列举一下：</p>
-<ul>
-<li>保护和隐藏原始资源服务器</li>
-<li>加密和SSL加速</li>
-<li>负载均衡</li>
-<li>缓存静态内容</li>
-<li>压缩</li>
-<li>减速上传</li>
-<li>安全</li>
-<li>外网发布</li>
-</ul>
-<p>下面做两个简单介绍</p>
-<p>1 保护和隐藏原始资源服务器</p>
-<p><img src="http://eden.dz11.com/xupload/xupload_1501912826000.jpeg" alt="剪贴板图片"></p>
-<p>用户A始终认为它访问的是原始服务器B而不是代理服务器Z，但实用际上反向代理服务器接受用户A的应答，从原始资源服务器B中取得用户A的需求资源，然后发送给用户A。由于防火墙的作用，只允许代理服务器Z访问原始资源服务器B。尽管在这个虚拟的环境下，防火墙和反向代理的共同作用保护了原始资源服务器B，但用户A并不知情。</p>
-<p>2 负载均衡</p>
-<p><img src="http://eden.dz11.com/xupload/xupload_1501912892000.jpeg" alt="剪贴板图片"></p>
-<p>当反向代理服务器不止一个的时候，我们甚至可以把它们做成集群，当更多的用户访问资源服务器B的时候，让不同的代理服务器Z（x）去应答不同的用户，然后发送不同用户需要的资源。</p>
-<h2 id="透明代理"><a href="#透明代理" class="headerlink" title="透明代理"></a>透明代理</h2><p>透明代理比较类似正向代理的功能，差别在于客户端根本不知道代理的存在，它改编你的request，并会传送真实IP（使用场景就是公司限制网络的访问）。</p>
-<p>比如为了工作效率或者安全，A公司屏蔽了QQ软件的使用。A公司的员工接上了网络，但发现无法使用qq。这就是透明代理捣的鬼。公司在内网和外网的中间插入一个透明代理，这个代理会根据规则抓取请求内容，遇到qq的请求我就把这个请求给屏蔽掉，这样就完成了透明屏蔽。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/blob对象介绍/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -973,6 +805,174 @@ slices.forEach(function(item, index) {
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/正向代理和反向代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/09/05/正向代理和反向代理/" itemprop="url">
+                  正向代理和反向代理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="正向代理和反向代理"><a href="#正向代理和反向代理" class="headerlink" title="正向代理和反向代理"></a>正向代理和反向代理</h1><p>最开始使用nginx相当懵，不清楚他的工作原理，最近在网上看了些相关资料，整理一下，方便理解和学习，首先从正向代理和反向代理开始。看了不少文章讲的都很绕，看了还是很晕，下面是知乎上的一篇文章，是我看过讲的比较清楚的一篇了。</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>1 正向代理</p>
+<p>正向代理是一个位于客户端和目标服务器之间的代理服务器(中间服务器)。为了从原始服务器取得内容，客户端向代理服务器发送一个请求，并且指定目标服务器，之后代理向目标服务器转交并且将获得的内容返回给客户端。正向代理的情况下客户端必须要进行一些特别的设置才能使用。</p>
+<p>2 反向代理</p>
+<p>反向代理正好相反。对于客户端来说，反向代理就好像目标服务器。并且客户端不需要进行任何设置。客户端向反向代理发送请求，接着反向代理判断请求走向何处，并将请求转交给客户端，使得这些内容就好似他自己一样，一次客户端并不会感知到反向代理后面的服务，也因此不需要客户端做任何设置，只需要把反向代理服务器当成真正的服务器就好了。</p>
+<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>正向代理需要你主动设置代理服务器ip或者域名进行访问，由设置的服务器ip或者域名去获取访问内容并返回；而反向代理不需要你做任何设置，直接访问服务器真实ip或者域名，但是服务器内部会自动根据访问内容进行跳转及内容返回，你不知道它最终访问的是哪些机器。</p>
+<p>正向代理是代理客户端，为客户端收发请求，使真实客户端对服务器不可见；而反向代理是代理服务器端，为服务器收发请求，使真实服务器对客户端不可见。</p>
+<p>从上面的描述也能看得出来正向代理和反向代理最关键的两点区别：</p>
+<ul>
+<li>是否指定目标服务器</li>
+<li>客户端是否要做设置</li>
+</ul>
+<p>下面用一张图来表示两者的差异：</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912275000.jpeg" alt="剪贴板图片"></p>
+<p>正向代理中，proxy和client同属一个LAN，对server透明； 反向代理中，proxy和server同属一个LAN，对client透明。 实际上proxy在两种代理中做的事都是代为收发请求和响应，不过从结构上来看正好左右互换了下，所以把前者那种代理方式叫做正向代理，后者叫做反向代理。</p>
+<p>从用途上来区分：</p>
+<ul>
+<li>正向代理：正向代理用途是为了在防火墙内的局域网提供访问internet的途径。另外还可以使用缓冲特性减少网络使用率</li>
+<li>反向代理：反向代理的用途是将防火墙后面的服务器提供给internet用户访问。同时还可以完成诸如负载均衡等功能</li>
+</ul>
+<p>从安全性来讲：</p>
+<ul>
+<li>正向代理：正向代理允许客户端通过它访问任意网站并且隐蔽客户端自身，因此你必须采取安全措施来确保仅为经过授权的客户端提供服务</li>
+<li>反向代理：对外是透明的，访问者并不知道自己访问的是代理。对访问者而言，他以为访问的就是原始服务器</li>
+</ul>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。</p>
+<p>1 从上面的介绍也就可以猜出来正向代理的至少一个功能（俗称翻墙），也即：用户A无法访问facebook，但是能访问服务器B，而服务器B可以访问facebook。于是用户A访问服务器B，通过服务器B去访问facebook，，服务器B收到请求后，去访问facebook，facebook把响应信息返回给服务器B，服务器B再把响应信息返回给A。这样，通过代理服务器B，就实现了翻墙。</p>
+<p>2 从上面的介绍也可以猜出来反向代理的至少一个功能（比如负载均衡），也即：假设用户A访问 www.somesite.com/something.html，但www.somesite.com’上并不存在something.html页面，于是接收用户请求的该服务器就偷偷从另外一台服务器上取回来，然后返回给用户，而用户并不知道something.html页面究竟位于哪台机器上。</p>
+<p>3 反向代理的作用就比较多了，这里简单列举一下：</p>
+<ul>
+<li>保护和隐藏原始资源服务器</li>
+<li>加密和SSL加速</li>
+<li>负载均衡</li>
+<li>缓存静态内容</li>
+<li>压缩</li>
+<li>减速上传</li>
+<li>安全</li>
+<li>外网发布</li>
+</ul>
+<p>下面做两个简单介绍</p>
+<p>1 保护和隐藏原始资源服务器</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912826000.jpeg" alt="剪贴板图片"></p>
+<p>用户A始终认为它访问的是原始服务器B而不是代理服务器Z，但实用际上反向代理服务器接受用户A的应答，从原始资源服务器B中取得用户A的需求资源，然后发送给用户A。由于防火墙的作用，只允许代理服务器Z访问原始资源服务器B。尽管在这个虚拟的环境下，防火墙和反向代理的共同作用保护了原始资源服务器B，但用户A并不知情。</p>
+<p>2 负载均衡</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912892000.jpeg" alt="剪贴板图片"></p>
+<p>当反向代理服务器不止一个的时候，我们甚至可以把它们做成集群，当更多的用户访问资源服务器B的时候，让不同的代理服务器Z（x）去应答不同的用户，然后发送不同用户需要的资源。</p>
+<h2 id="透明代理"><a href="#透明代理" class="headerlink" title="透明代理"></a>透明代理</h2><p>透明代理比较类似正向代理的功能，差别在于客户端根本不知道代理的存在，它改编你的request，并会传送真实IP（使用场景就是公司限制网络的访问）。</p>
+<p>比如为了工作效率或者安全，A公司屏蔽了QQ软件的使用。A公司的员工接上了网络，但发现无法使用qq。这就是透明代理捣的鬼。公司在内网和外网的中间插入一个透明代理，这个代理会根据规则抓取请求内容，遇到qq的请求我就把这个请求给屏蔽掉，这样就完成了透明屏蔽。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/01/js 深拷贝和浅拷贝/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1130,178 +1130,6 @@ slices.forEach(function(item, index) {
 <p>在 <strong>$.extend</strong> 方法内部，只有一个形参 <strong>target</strong>，这个设计你真的很巧妙。<br>因为形参只有一个，所以 target 就是传入的第一个参数的值，并在函数内部设置一个变量 args 来接收去除第一个参数的其余参数，如果该值是一个布尔类型的值的话，说明要启用深拷贝，就将 deep 设置为 true，并将 target 赋值为 args 的第一个值（也就是真正的 target）。如果该值不是一个布尔类型的话，那么传入的第一个值仍为 target 不需要进行处理，只需要遍历使用 extend 方法就可以。</p>
 <p>这里有点绕，但是真的设计的很精妙，建议自己打断点试一下，会有意外收获（玩转 js 的大神请忽略）。</p>
 <p>而在 extend 的内部，是拷贝的过程。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/08/JavaScript 专题之如何判断两个对象相等/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/08/08/JavaScript 专题之如何判断两个对象相等/" itemprop="url">
-                  JavaScript 专题之如何判断两个对象相等
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T00:00:00+08:00">
-                2017-08-08
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>虽然标题写的是如何判断两个对象相等，但本篇我们不仅仅判断两个对象相等，实际上，我们要做到的是如何判断两个参数相等，而这必然会涉及到多种类型的判断。</p>
-<h2 id="相等"><a href="#相等" class="headerlink" title="相等"></a>相等</h2><p>什么是相等？，我们认为只要 === 的结果为 true，两者就相等，然而今天我们重新定义相等：</p>
-<p>我们认为：</p>
-<p>NaN 和 NaN 是相等<br>[1] 和 [1] 是相等<br>{value: 1} 和 {value: 1} 是相等<br>不仅仅是这些长得一样的，还有</p>
-<p>1 和 new Number(1) 是相等<br>‘Curly’ 和 new String(‘Curly’) 是相等<br>true 和 new Boolean(true) 是相等<br>更复杂的我们会在接下来的内容中看到。</p>
-<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>我们的目标是写一个 eq 函数用来判断两个参数是否相等，使用效果如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123; ... &#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> a = [<span class="number">1</span>];</div><div class="line"><span class="keyword">var</span> b = [<span class="number">1</span>];</div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
-<p>在写这个看似很简单的函数之前，我们首先了解在一些简单的情况下是如何判断的？</p>
-<h2 id="0-与-0"><a href="#0-与-0" class="headerlink" title="+0 与 -0"></a>+0 与 -0</h2><p>如果 a === b 的结果为 true， 那么 a 和 b 就是相等的吗？一般情况下，当然是这样的，但是有一个特殊的例子，就是 +0 和 -0。</p>
-<p>JavaScript “处心积虑”的想抹平两者的差异：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 表现1</span></div><div class="line"><span class="built_in">console</span>.log(+<span class="number">0</span> === <span class="number">-0</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="comment">// 表现2</span></div><div class="line">(<span class="number">-0</span>).toString() <span class="comment">// '0'</span></div><div class="line">(+<span class="number">0</span>).toString() <span class="comment">// '0'</span></div><div class="line"></div><div class="line"><span class="comment">// 表现3</span></div><div class="line"><span class="number">-0</span> &lt; +<span class="number">0</span> <span class="comment">// false</span></div><div class="line">+<span class="number">0</span> &lt; <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
-<p>即便如此，两者依然是不同的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> / +<span class="number">0</span> <span class="comment">// Infinity</span></div><div class="line"><span class="number">1</span> / <span class="number">-0</span> <span class="comment">// -Infinity</span></div><div class="line"></div><div class="line"><span class="number">1</span> / +<span class="number">0</span> === <span class="number">1</span> / <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
-<p>也许你会好奇为什么要有 +0 和 -0 呢？</p>
-<p>这是因为 JavaScript 采用了IEEE_754 浮点数表示法(几乎所有现代编程语言所采用)，这是一种二进制表示法，按照这个标准，最高位是符号位(0 代表正，1 代表负)，剩下的用于表示大小。而对于零这个边界值 ，1000(-0) 和 0000(0)都是表示 0 ，这才有了正负零的区别。</p>
-<p>也许你会好奇什么时候会产生 -0 呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Math.round(-0.1) // -0</div></pre></td></tr></table></figure></p>
-<p>那么我们又该如何在 === 结果为 true 的时候，区别 0 和 -0 得出正确的结果呢？我们可以这样做：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
-<h2 id="NaN"><a href="#NaN" class="headerlink" title="NaN"></a>NaN</h2><p>在本篇，我们认为 NaN 和 NaN 是相等的，那又该如何判断出 NaN 呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="literal">NaN</span> === <span class="literal">NaN</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
-<p>利用 NaN 不等于自身的特性，我们可以区别出 NaN，那么这个 eq 函数又该怎么写呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
-<h2 id="eq-函数"><a href="#eq-函数" class="headerlink" title="eq 函数"></a>eq 函数</h2><p>现在，我们已经可以去写 eq 函数的第一版了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// eq 第一版</span></div><div class="line"><span class="comment">// 用来过滤掉简单的类型比较，复杂的对象使用 deepEq 函数进行处理</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b);</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
-<p>也许你会好奇是不是少了一个 <strong>typeof b !== function</strong>?<br>试想如果我们添加上了这句，当 a 是基本类型，而 b 是函数的时候，就会进入 deepEq 函数，而去掉这一句，就会进入直接进入 false，实际上 基本类型和函数肯定是不会相等的，所以这样做代码又少，又可以让一种情况更早退出。</p>
-<h2 id="String-对象"><a href="#String-对象" class="headerlink" title="String 对象"></a>String 对象</h2><p>现在我们开始写 deepEq 函数，一个要处理的重大难题就是 ‘Curly’ 和 new String(‘Curly’) 如何判断成相等？</p>
-<p>两者的类型都不一样呐！不信我们看 typeof 的操作结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="string">'Curly'</span>); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// object</span></div></pre></td></tr></table></figure></p>
-<p>可是我们还有更多的方法判断类型，比如 Object.prototype.toString：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line">toString.call(<span class="string">'Curly'</span>); <span class="comment">// "[object String]"</span></div><div class="line">toString.call(<span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// "[object String]"</span></div></pre></td></tr></table></figure></p>
-<p>神奇的是使用 toString 方法两者判断的结果却是一致的，可是就算知道了这一点，还是不知道如何判断字符串和字符串包装对象是相等的呢？</p>
-<p>那我们利用隐式类型转换呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'Curly'</span> + <span class="string">''</span> === <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>) + <span class="string">''</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
-<p>看来我们已经有了思路：如果 a 和 b 的 Object.prototype.toString的结果一致，并且都是”[object String]”，那我们就使用 ‘’ + a === ‘’ + b 进行判断。</p>
-<p>可是不止有 String 对象呐，Boolean、Number、RegExp、Date呢？</p>
-<h2 id="更多对象"><a href="#更多对象" class="headerlink" title="更多对象"></a>更多对象</h2><p>跟 String 同样的思路，利用隐式类型转换。</p>
-<h3 id="Boolean"><a href="#Boolean" class="headerlink" title="Boolean"></a>Boolean</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="literal">true</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">true</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
-<h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
-<h3 id="RegExp"><a href="#RegExp" class="headerlink" title="RegExp"></a>RegExp</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="regexp">/a/i</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="regexp">/a/i</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">''</span> + a === <span class="string">''</span> + b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
-<h3 id="Number"><a href="#Number" class="headerlink" title="Number"></a>Number</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Number</span>(<span class="number">1</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
-<p>嗯哼？你确定 Number 能这么简单的判断？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
-<p>可是 a 和 b 应该被判断成 true 的呐~</p>
-<p>那么我们就改成这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断 Number(NaN) Object(NaN) 等情况</span></div><div class="line">    <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">    <span class="comment">// 其他判断 ...</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
-<h2 id="deepEq-函数"><a href="#deepEq-函数" class="headerlink" title="deepEq 函数"></a>deepEq 函数</h2><p>现在我们可以写一点 deepEq 函数了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 其他判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="构造函数实例"><a href="#构造函数实例" class="headerlink" title="构造函数实例"></a>构造函数实例</h2><p>我们看个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> Person(<span class="string">'Kevin'</span>);</div><div class="line"><span class="keyword">var</span> animal = <span class="keyword">new</span> Animal(<span class="string">'Kevin'</span>);</div><div class="line"></div><div class="line">eq(person, animal) <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
-<p>虽然 <strong>person</strong> 和 <strong>animal</strong> 都是 <strong>{name: ‘Kevin’}</strong>，但是 <strong>person</strong> 和 <strong>animal</strong> 属于不同构造函数的实例，为了做出区分，我们认为是不同的对象。</p>
-<p>如果两个对象所属的构造函数对象不同，两个对象就一定不相等吗？</p>
-<p>并不一定，我们再举个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> attrs = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line">attrs.name = <span class="string">"Bob"</span>;</div><div class="line">eq(attrs, &#123;<span class="attr">name</span>: <span class="string">"Bob"</span>&#125;); <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
-<p>尽管 <strong>attrs</strong> 没有原型，<strong>{name: “Bob”}</strong> 的构造函数是 <strong>Object</strong>，但是在实际应用中，只要他们有着相同的键值对，我们依然认为是相等。</p>
-<p>从函数设计的角度来看，我们不应该让他们相等，但是从实践的角度，我们让他们相等，所以相等就是一件如此随意的事情吗？！对啊，我也在想：<strong>undersocre</strong>，你怎么能如此随意呢！！！</p>
-<p>哎，吐槽完了，我们还是要接着写这个相等函数，我们可以先做个判断，对于不同构造函数下的实例直接返回 <strong>false</strong>。</p>
-<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 接着上面的内容</span></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor, bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 下面还有好多判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h2 id="数组相等"><a href="#数组相等" class="headerlink" title="数组相等"></a>数组相等</h2><p>现在终于可以进入我们期待已久的数组和对象的判断，不过其实这个很简单，就是递归遍历一遍……<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 再接着上面的内容</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">         &#125;</div><div class="line">    &#125; </div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a), key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key]))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
-<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><p>如果觉得这就结束了，简直是太天真，因为最难的部分才终于要开始，这个问题就是循环引用！</p>
-<p>举个简单的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">b = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">a.abc = a;</div><div class="line">b.abc = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
-<p>再复杂一点的，比如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">b = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
-<p>为了给大家演示下循环引用，大家可以把下面这段已经精简过的代码复制到浏览器中尝试：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// demo</span></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="comment">// 这是为了让你看到代码其实一直在执行</span></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key])</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
-<p>嗯，以上的代码是死循环。</p>
-<p>那么，我们又该如何解决这个问题呢？underscore 的思路是 eq 的时候，多传递两个参数为 aStack 和 bStack，用来储存 a 和 b 递归比较过程中的 a 和 b 的值，咋说的这么绕口呢？<br>我们直接看个精简的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line"></div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">              <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key], aStack, bStack)</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// aStack.pop();</span></div><div class="line">    <span class="comment">// bStack.pop();</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b))</div></pre></td></tr></table></figure></p>
-<p>之所以注释掉 <strong>aStack.pop()</strong>和<strong>bStack.pop()</strong>这两句，是为了方便大家查看 <strong>aStack</strong>  <strong>bStack</strong>的值。</p>
-<h2 id="最终的-eq-函数"><a href="#最终的-eq-函数" class="headerlink" title="最终的 eq 函数"></a>最终的 eq 函数</h2><p>最终的代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// a 和 b 的内部属性 [[class]] 相同时 返回 true</span></div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor,</div><div class="line">            bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="comment">// 检查是否有循环引用的部分</span></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">            <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="comment">// 数组判断</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 对象判断</span></div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a),</div><div class="line">            key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line"></div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key], aStack, bStack))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.pop();</div><div class="line">    bStack.pop();</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="built_in">Number</span>(<span class="literal">NaN</span>), <span class="built_in">Number</span>(<span class="literal">NaN</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="string">'Curly'</span>, <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq([<span class="number">1</span>], [<span class="number">1</span>])); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(&#123; <span class="attr">value</span>: <span class="number">1</span> &#125;, &#123; <span class="attr">value</span>: <span class="number">1</span> &#125;)); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
-<p>真让人感叹一句：eq 不愧是 underscore 中实现代码行数最多的函数了！</p>
 
           
         
@@ -1735,6 +1563,178 @@ slices.forEach(function(item, index) {
 </tr>
 </tbody>
 </table>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/08/08/JavaScript 专题之如何判断两个对象相等/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/08/08/JavaScript 专题之如何判断两个对象相等/" itemprop="url">
+                  JavaScript 专题之如何判断两个对象相等
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-08T00:00:00+08:00">
+                2017-08-08
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>虽然标题写的是如何判断两个对象相等，但本篇我们不仅仅判断两个对象相等，实际上，我们要做到的是如何判断两个参数相等，而这必然会涉及到多种类型的判断。</p>
+<h2 id="相等"><a href="#相等" class="headerlink" title="相等"></a>相等</h2><p>什么是相等？，我们认为只要 === 的结果为 true，两者就相等，然而今天我们重新定义相等：</p>
+<p>我们认为：</p>
+<p>NaN 和 NaN 是相等<br>[1] 和 [1] 是相等<br>{value: 1} 和 {value: 1} 是相等<br>不仅仅是这些长得一样的，还有</p>
+<p>1 和 new Number(1) 是相等<br>‘Curly’ 和 new String(‘Curly’) 是相等<br>true 和 new Boolean(true) 是相等<br>更复杂的我们会在接下来的内容中看到。</p>
+<h2 id="目标"><a href="#目标" class="headerlink" title="目标"></a>目标</h2><p>我们的目标是写一个 eq 函数用来判断两个参数是否相等，使用效果如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123; ... &#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> a = [<span class="number">1</span>];</div><div class="line"><span class="keyword">var</span> b = [<span class="number">1</span>];</div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>在写这个看似很简单的函数之前，我们首先了解在一些简单的情况下是如何判断的？</p>
+<h2 id="0-与-0"><a href="#0-与-0" class="headerlink" title="+0 与 -0"></a>+0 与 -0</h2><p>如果 a === b 的结果为 true， 那么 a 和 b 就是相等的吗？一般情况下，当然是这样的，但是有一个特殊的例子，就是 +0 和 -0。</p>
+<p>JavaScript “处心积虑”的想抹平两者的差异：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 表现1</span></div><div class="line"><span class="built_in">console</span>.log(+<span class="number">0</span> === <span class="number">-0</span>); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="comment">// 表现2</span></div><div class="line">(<span class="number">-0</span>).toString() <span class="comment">// '0'</span></div><div class="line">(+<span class="number">0</span>).toString() <span class="comment">// '0'</span></div><div class="line"></div><div class="line"><span class="comment">// 表现3</span></div><div class="line"><span class="number">-0</span> &lt; +<span class="number">0</span> <span class="comment">// false</span></div><div class="line">+<span class="number">0</span> &lt; <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>即便如此，两者依然是不同的：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="number">1</span> / +<span class="number">0</span> <span class="comment">// Infinity</span></div><div class="line"><span class="number">1</span> / <span class="number">-0</span> <span class="comment">// -Infinity</span></div><div class="line"></div><div class="line"><span class="number">1</span> / +<span class="number">0</span> === <span class="number">1</span> / <span class="number">-0</span> <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>也许你会好奇为什么要有 +0 和 -0 呢？</p>
+<p>这是因为 JavaScript 采用了IEEE_754 浮点数表示法(几乎所有现代编程语言所采用)，这是一种二进制表示法，按照这个标准，最高位是符号位(0 代表正，1 代表负)，剩下的用于表示大小。而对于零这个边界值 ，1000(-0) 和 0000(0)都是表示 0 ，这才有了正负零的区别。</p>
+<p>也许你会好奇什么时候会产生 -0 呢？<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">Math.round(-0.1) // -0</div></pre></td></tr></table></figure></p>
+<p>那么我们又该如何在 === 结果为 true 的时候，区别 0 和 -0 得出正确的结果呢？我们可以这样做：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>)</span>&#123;</div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line">    <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<h2 id="NaN"><a href="#NaN" class="headerlink" title="NaN"></a>NaN</h2><p>在本篇，我们认为 NaN 和 NaN 是相等的，那又该如何判断出 NaN 呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="literal">NaN</span> === <span class="literal">NaN</span>); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>利用 NaN 不等于自身的特性，我们可以区别出 NaN，那么这个 eq 函数又该怎么写呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<h2 id="eq-函数"><a href="#eq-函数" class="headerlink" title="eq 函数"></a>eq 函数</h2><p>现在，我们已经可以去写 eq 函数的第一版了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// eq 第一版</span></div><div class="line"><span class="comment">// 用来过滤掉简单的类型比较，复杂的对象使用 deepEq 函数进行处理</span></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b);</div><div class="line">&#125;;</div></pre></td></tr></table></figure></p>
+<p>也许你会好奇是不是少了一个 <strong>typeof b !== function</strong>?<br>试想如果我们添加上了这句，当 a 是基本类型，而 b 是函数的时候，就会进入 deepEq 函数，而去掉这一句，就会进入直接进入 false，实际上 基本类型和函数肯定是不会相等的，所以这样做代码又少，又可以让一种情况更早退出。</p>
+<h2 id="String-对象"><a href="#String-对象" class="headerlink" title="String 对象"></a>String 对象</h2><p>现在我们开始写 deepEq 函数，一个要处理的重大难题就是 ‘Curly’ 和 new String(‘Curly’) 如何判断成相等？</p>
+<p>两者的类型都不一样呐！不信我们看 typeof 的操作结果：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="string">'Curly'</span>); <span class="comment">// string</span></div><div class="line"><span class="built_in">console</span>.log(<span class="keyword">typeof</span> <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// object</span></div></pre></td></tr></table></figure></p>
+<p>可是我们还有更多的方法判断类型，比如 Object.prototype.toString：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line">toString.call(<span class="string">'Curly'</span>); <span class="comment">// "[object String]"</span></div><div class="line">toString.call(<span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>)); <span class="comment">// "[object String]"</span></div></pre></td></tr></table></figure></p>
+<p>神奇的是使用 toString 方法两者判断的结果却是一致的，可是就算知道了这一点，还是不知道如何判断字符串和字符串包装对象是相等的呢？</p>
+<p>那我们利用隐式类型转换呢？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="built_in">console</span>.log(<span class="string">'Curly'</span> + <span class="string">''</span> === <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>) + <span class="string">''</span>); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>看来我们已经有了思路：如果 a 和 b 的 Object.prototype.toString的结果一致，并且都是”[object String]”，那我们就使用 ‘’ + a === ‘’ + b 进行判断。</p>
+<p>可是不止有 String 对象呐，Boolean、Number、RegExp、Date呢？</p>
+<h2 id="更多对象"><a href="#更多对象" class="headerlink" title="更多对象"></a>更多对象</h2><p>跟 String 同样的思路，利用隐式类型转换。</p>
+<h3 id="Boolean"><a href="#Boolean" class="headerlink" title="Boolean"></a>Boolean</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="literal">true</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Boolean</span>(<span class="literal">true</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="number">2009</span>, <span class="number">9</span>, <span class="number">25</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="RegExp"><a href="#RegExp" class="headerlink" title="RegExp"></a>RegExp</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="regexp">/a/i</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">RegExp</span>(<span class="regexp">/a/i</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(<span class="string">''</span> + a === <span class="string">''</span> + b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<h3 id="Number"><a href="#Number" class="headerlink" title="Number"></a>Number</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="number">1</span>;</div><div class="line"><span class="keyword">var</span> b = <span class="keyword">new</span> <span class="built_in">Number</span>(<span class="number">1</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b) <span class="comment">// true</span></div></pre></td></tr></table></figure>
+<p>嗯哼？你确定 Number 能这么简单的判断？<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(+a === +b); <span class="comment">// false</span></div></pre></td></tr></table></figure></p>
+<p>可是 a 和 b 应该被判断成 true 的呐~</p>
+<p>那么我们就改成这样：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"><span class="keyword">var</span> b = <span class="built_in">Number</span>(<span class="literal">NaN</span>);</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="comment">// 判断 Number(NaN) Object(NaN) 等情况</span></div><div class="line">    <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">    <span class="comment">// 其他判断 ...</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)); <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<h2 id="deepEq-函数"><a href="#deepEq-函数" class="headerlink" title="deepEq 函数"></a>deepEq 函数</h2><p>现在我们可以写一点 deepEq 函数了。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">      <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 其他判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="构造函数实例"><a href="#构造函数实例" class="headerlink" title="构造函数实例"></a>构造函数实例</h2><p>我们看个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Person</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Animal</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">this</span>.name = name</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">var</span> person = <span class="keyword">new</span> Person(<span class="string">'Kevin'</span>);</div><div class="line"><span class="keyword">var</span> animal = <span class="keyword">new</span> Animal(<span class="string">'Kevin'</span>);</div><div class="line"></div><div class="line">eq(person, animal) <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
+<p>虽然 <strong>person</strong> 和 <strong>animal</strong> 都是 <strong>{name: ‘Kevin’}</strong>，但是 <strong>person</strong> 和 <strong>animal</strong> 属于不同构造函数的实例，为了做出区分，我们认为是不同的对象。</p>
+<p>如果两个对象所属的构造函数对象不同，两个对象就一定不相等吗？</p>
+<p>并不一定，我们再举个例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> attrs = <span class="built_in">Object</span>.create(<span class="literal">null</span>);</div><div class="line">attrs.name = <span class="string">"Bob"</span>;</div><div class="line">eq(attrs, &#123;<span class="attr">name</span>: <span class="string">"Bob"</span>&#125;); <span class="comment">// ???</span></div></pre></td></tr></table></figure></p>
+<p>尽管 <strong>attrs</strong> 没有原型，<strong>{name: “Bob”}</strong> 的构造函数是 <strong>Object</strong>，但是在实际应用中，只要他们有着相同的键值对，我们依然认为是相等。</p>
+<p>从函数设计的角度来看，我们不应该让他们相等，但是从实践的角度，我们让他们相等，所以相等就是一件如此随意的事情吗？！对啊，我也在想：<strong>undersocre</strong>，你怎么能如此随意呢！！！</p>
+<p>哎，吐槽完了，我们还是要接着写这个相等函数，我们可以先做个判断，对于不同构造函数下的实例直接返回 <strong>false</strong>。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 接着上面的内容</span></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor, bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// 下面还有好多判断</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h2 id="数组相等"><a href="#数组相等" class="headerlink" title="数组相等"></a>数组相等</h2><p>现在终于可以进入我们期待已久的数组和对象的判断，不过其实这个很简单，就是递归遍历一遍……<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line">    <span class="comment">// 再接着上面的内容</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">         &#125;</div><div class="line">    &#125; </div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a), key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key]))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<h2 id="循环引用"><a href="#循环引用" class="headerlink" title="循环引用"></a>循环引用</h2><p>如果觉得这就结束了，简直是太天真，因为最难的部分才终于要开始，这个问题就是循环引用！</p>
+<p>举个简单的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">b = &#123;<span class="attr">abc</span>: <span class="literal">null</span>&#125;;</div><div class="line">a.abc = a;</div><div class="line">b.abc = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>再复杂一点的，比如：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">a = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">b = &#123;<span class="attr">foo</span>: &#123;<span class="attr">b</span>: &#123;<span class="attr">foo</span>: &#123;<span class="attr">c</span>: &#123;<span class="attr">foo</span>: <span class="literal">null</span>&#125;&#125;&#125;&#125;&#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>为了给大家演示下循环引用，大家可以把下面这段已经精简过的代码复制到浏览器中尝试：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// demo</span></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="comment">// 这是为了让你看到代码其实一直在执行</span></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key])</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key])) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line">eq(a, b)</div></pre></td></tr></table></figure></p>
+<p>嗯，以上的代码是死循环。</p>
+<p>那么，我们又该如何解决这个问题呢？underscore 的思路是 eq 的时候，多传递两个参数为 aStack 和 bStack，用来储存 a 和 b 递归比较过程中的 a 和 b 的值，咋说的这么绕口呢？<br>我们直接看个精简的例子：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line">    <span class="keyword">if</span> (<span class="keyword">typeof</span> a == <span class="string">'number'</span>) &#123;</div><div class="line">        <span class="keyword">return</span> a === b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack)</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line"></div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">              <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a);</div><div class="line">    <span class="keyword">var</span> length = keys.length;</div><div class="line">    <span class="keyword">var</span> key;</div><div class="line"></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        key = keys[length]</div><div class="line"></div><div class="line">        <span class="built_in">console</span>.log(a[key], b[key], aStack, bStack)</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (!eq(a[key], b[key], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="comment">// aStack.pop();</span></div><div class="line">    <span class="comment">// bStack.pop();</span></div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b))</div></pre></td></tr></table></figure></p>
+<p>之所以注释掉 <strong>aStack.pop()</strong>和<strong>bStack.pop()</strong>这两句，是为了方便大家查看 <strong>aStack</strong>  <strong>bStack</strong>的值。</p>
+<h2 id="最终的-eq-函数"><a href="#最终的-eq-函数" class="headerlink" title="最终的 eq 函数"></a>最终的 eq 函数</h2><p>最终的代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> toString = <span class="built_in">Object</span>.prototype.toString;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">isFunction</span>(<span class="params">obj</span>) </span>&#123;</div><div class="line">    <span class="keyword">return</span> toString.call(obj) === <span class="string">'[object Function]'</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">eq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// === 结果为 true 的区别出 +0 和 -0</span></div><div class="line">    <span class="keyword">if</span> (a === b) <span class="keyword">return</span> a !== <span class="number">0</span> || <span class="number">1</span> / a === <span class="number">1</span> / b;</div><div class="line"></div><div class="line">    <span class="comment">// typeof null 的结果为 object ，这里做判断，是为了让有 null 的情况尽早退出函数</span></div><div class="line">    <span class="keyword">if</span> (a == <span class="literal">null</span> || b == <span class="literal">null</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 判断 NaN</span></div><div class="line">    <span class="keyword">if</span> (a !== a) <span class="keyword">return</span> b !== b;</div><div class="line"></div><div class="line">    <span class="comment">// 判断参数 a 类型，如果是基本类型，在这里可以直接返回 false</span></div><div class="line">    <span class="keyword">var</span> type = <span class="keyword">typeof</span> a;</div><div class="line">    <span class="keyword">if</span> (type !== <span class="string">'function'</span> &amp;&amp; type !== <span class="string">'object'</span> &amp;&amp; <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="comment">// 更复杂的对象使用 deepEq 函数进行深度比较</span></div><div class="line">    <span class="keyword">return</span> deepEq(a, b, aStack, bStack);</div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">deepEq</span>(<span class="params">a, b, aStack, bStack</span>) </span>&#123;</div><div class="line"></div><div class="line">    <span class="comment">// a 和 b 的内部属性 [[class]] 相同时 返回 true</span></div><div class="line">    <span class="keyword">var</span> className = toString.call(a);</div><div class="line">    <span class="keyword">if</span> (className !== toString.call(b)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">    <span class="keyword">switch</span> (className) &#123;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object RegExp]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object String]'</span>:</div><div class="line">            <span class="keyword">return</span> <span class="string">''</span> + a === <span class="string">''</span> + b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Number]'</span>:</div><div class="line">            <span class="keyword">if</span> (+a !== +a) <span class="keyword">return</span> +b !== +b;</div><div class="line">            <span class="keyword">return</span> +a === <span class="number">0</span> ? <span class="number">1</span> / +a === <span class="number">1</span> / b : +a === +b;</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Date]'</span>:</div><div class="line">        <span class="keyword">case</span> <span class="string">'[object Boolean]'</span>:</div><div class="line">            <span class="keyword">return</span> +a === +b;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">var</span> areArrays = className === <span class="string">'[object Array]'</span>;</div><div class="line">    <span class="comment">// 不是数组</span></div><div class="line">    <span class="keyword">if</span> (!areArrays) &#123;</div><div class="line">        <span class="comment">// 过滤掉两个函数的情况</span></div><div class="line">        <span class="keyword">if</span> (<span class="keyword">typeof</span> a != <span class="string">'object'</span> || <span class="keyword">typeof</span> b != <span class="string">'object'</span>) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> aCtor = a.constructor,</div><div class="line">            bCtor = b.constructor;</div><div class="line">        <span class="comment">// aCtor 和 bCtor 必须都存在并且都不是 Object 构造函数的情况下，aCtor 不等于 bCtor， 那这两个对象就真的不相等啦</span></div><div class="line">        <span class="keyword">if</span> (aCtor == bCtor &amp;&amp; !(isFunction(aCtor) &amp;&amp; aCtor <span class="keyword">instanceof</span> aCtor &amp;&amp; isFunction(bCtor) &amp;&amp; bCtor <span class="keyword">instanceof</span> bCtor) &amp;&amp; (<span class="string">'constructor'</span> <span class="keyword">in</span> a &amp;&amp; <span class="string">'constructor'</span> <span class="keyword">in</span> b)) &#123;</div><div class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line"></div><div class="line">    aStack = aStack || [];</div><div class="line">    bStack = bStack || [];</div><div class="line">    <span class="keyword">var</span> length = aStack.length;</div><div class="line"></div><div class="line">    <span class="comment">// 检查是否有循环引用的部分</span></div><div class="line">    <span class="keyword">while</span> (length--) &#123;</div><div class="line">        <span class="keyword">if</span> (aStack[length] === a) &#123;</div><div class="line">            <span class="keyword">return</span> bStack[length] === b;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.push(a);</div><div class="line">    bStack.push(b);</div><div class="line"></div><div class="line">    <span class="comment">// 数组判断</span></div><div class="line">    <span class="keyword">if</span> (areArrays) &#123;</div><div class="line"></div><div class="line">        length = a.length;</div><div class="line">        <span class="keyword">if</span> (length !== b.length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line"></div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line">            <span class="keyword">if</span> (!eq(a[length], b[length], aStack, bStack)) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">    <span class="comment">// 对象判断</span></div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line"></div><div class="line">        <span class="keyword">var</span> keys = <span class="built_in">Object</span>.keys(a),</div><div class="line">            key;</div><div class="line">        length = keys.length;</div><div class="line"></div><div class="line">        <span class="keyword">if</span> (<span class="built_in">Object</span>.keys(b).length !== length) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        <span class="keyword">while</span> (length--) &#123;</div><div class="line"></div><div class="line">            key = keys[length];</div><div class="line">            <span class="keyword">if</span> (!(b.hasOwnProperty(key) &amp;&amp; eq(a[key], b[key], aStack, bStack))) <span class="keyword">return</span> <span class="literal">false</span>;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    aStack.pop();</div><div class="line">    bStack.pop();</div><div class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">0</span>)) <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="number">0</span>, <span class="number">-0</span>)) <span class="comment">// false</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="literal">NaN</span>, <span class="literal">NaN</span>)); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="built_in">Number</span>(<span class="literal">NaN</span>), <span class="built_in">Number</span>(<span class="literal">NaN</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(<span class="string">'Curly'</span>, <span class="keyword">new</span> <span class="built_in">String</span>(<span class="string">'Curly'</span>))); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq([<span class="number">1</span>], [<span class="number">1</span>])); <span class="comment">// true</span></div><div class="line"><span class="built_in">console</span>.log(eq(&#123; <span class="attr">value</span>: <span class="number">1</span> &#125;, &#123; <span class="attr">value</span>: <span class="number">1</span> &#125;)); <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="keyword">var</span> a, b;</div><div class="line"></div><div class="line">a = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">b = &#123; <span class="attr">foo</span>: &#123; <span class="attr">b</span>: &#123; <span class="attr">foo</span>: &#123; <span class="attr">c</span>: &#123; <span class="attr">foo</span>: <span class="literal">null</span> &#125; &#125; &#125; &#125; &#125;;</div><div class="line">a.foo.b.foo.c.foo = a;</div><div class="line">b.foo.b.foo.c.foo = b;</div><div class="line"></div><div class="line"><span class="built_in">console</span>.log(eq(a, b)) <span class="comment">// true</span></div></pre></td></tr></table></figure></p>
+<p>真让人感叹一句：eq 不愧是 underscore 中实现代码行数最多的函数了！</p>
 
           
         
