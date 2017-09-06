@@ -1,0 +1,949 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="blob对象介绍一个 Blob对象表示一个不可变的, 原始数据的类似文件对象。Blob表示的数据不一定是一个JavaScript原生格式blob对象本质上是js中的一个对象，里面可以储存大量的二进制编码格式的数据。  创建blob对象创建blob对象本质上和创建一个其他对象的方式是一样的，都是使用Blob() 的构造函数来进行创建。构造函数接受两个参数： 第一个参数为一个数据序列，可以是任意格式的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="blob对象介绍">
+<meta property="og:url" content="http://blog.webtoatl.cn/2017/09/05/blob对象介绍/index.html">
+<meta property="og:site_name" content="赖宝的宝">
+<meta property="og:description" content="blob对象介绍一个 Blob对象表示一个不可变的, 原始数据的类似文件对象。Blob表示的数据不一定是一个JavaScript原生格式blob对象本质上是js中的一个对象，里面可以储存大量的二进制编码格式的数据。  创建blob对象创建blob对象本质上和创建一个其他对象的方式是一样的，都是使用Blob() 的构造函数来进行创建。构造函数接受两个参数： 第一个参数为一个数据序列，可以是任意格式的">
+<meta property="og:updated_time" content="2017-09-06T12:38:44.582Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="blob对象介绍">
+<meta name="twitter:description" content="blob对象介绍一个 Blob对象表示一个不可变的, 原始数据的类似文件对象。Blob表示的数据不一定是一个JavaScript原生格式blob对象本质上是js中的一个对象，里面可以储存大量的二进制编码格式的数据。  创建blob对象创建blob对象本质上和创建一个其他对象的方式是一样的，都是使用Blob() 的构造函数来进行创建。构造函数接受两个参数： 第一个参数为一个数据序列，可以是任意格式的">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://blog.webtoatl.cn/2017/09/05/blob对象介绍/"/>
+
+
+
+
+
+  <title> blob对象介绍 | 赖宝的宝 </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">赖宝的宝</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">前端技能分享</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/blob对象介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                blob对象介绍
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="blob对象介绍"><a href="#blob对象介绍" class="headerlink" title="blob对象介绍"></a>blob对象介绍</h1><p>一个 Blob对象表示一个不可变的, 原始数据的类似文件对象。Blob表示的数据不一定是一个JavaScript原生格式<br>blob对象本质上是js中的一个对象，里面可以储存大量的二进制编码格式的数据。</p>
+<hr>
+<h2 id="创建blob对象"><a href="#创建blob对象" class="headerlink" title="创建blob对象"></a>创建blob对象</h2><p>创建blob对象本质上和创建一个其他对象的方式是一样的，都是使用Blob() 的构造函数来进行创建。<br>构造函数接受两个参数：</p>
+<p>第一个参数为一个数据序列，可以是任意格式的值。</p>
+<p>第二个参数是一个包含两个属性的对象{<br>type: MIME的类型,<br>endings: 决定第一个参数的数据格式，可以取值为 “transparent” 或者 “native”（transparent的话不变，是默认值，native 的话按操作系统转换） 。<br>}</p>
+<p>Blob()构造函数允许使用其他对象创建一个Blob对象，比如用字符串构建一个blob</p>
+<pre><code>var debug = {hello: &quot;world&quot;};
+var blob = new Blob([JSON.stringify(debug, null, 2)],
+  {type : &apos;application/json&apos;});
+</code></pre><p>既然是对象，那么blob也拥有自己的属性以及方法</p>
+<h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4><ul>
+<li><p>Blob.isClosed (只读)</p>
+<p>  布尔值，指示 Blob.close() 是否在该对象上调用过。 关闭的 blob 对象不可读。</p>
+</li>
+<li><p>Blob.size (只读)</p>
+<p>  Blob 对象中所包含数据的大小（字节）。</p>
+</li>
+<li><p>Blob.type (只读)</p>
+<p>  一个字符串，表明该Blob对象所包含数据的MIME类型。如果类型未知，则该值为空字符串。</p>
+</li>
+</ul>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><ul>
+<li><p>Blob.close() </p>
+<p>  关闭 Blob 对象，以便能释放底层资源。</p>
+</li>
+<li><p>Blob.slice([start[, end[, contentType]]])</p>
+<p>  返回一个新的 Blob 对象，包含了源 Blob<br>对象中指定范围内的数据。其实就是对这个blob中的数据进行切割，我们在对文件进行分片上传的时候需要使用到这个方法。</p>
+</li>
+</ul>
+<p>看到上面这些方法和属性，使用过HTML5提供的File接口的应该都很熟悉，这些属性和方法在File接口中也都有。<br>其实File接口就是基于Blob，继承blob功能并将其扩展为支持用户系统上的文件，也就是说：</p>
+<p>==File接口中的Flie对象就是继承与Blob对象==。</p>
+<h1 id="blob对象的使用"><a href="#blob对象的使用" class="headerlink" title="blob对象的使用"></a>blob对象的使用</h1><p>上面说了很多关于Blob对象的一些概念性的东西，下面我们来看看实际用途。</p>
+<hr>
+<h2 id="分片上传"><a href="#分片上传" class="headerlink" title="分片上传"></a>分片上传</h2><blockquote>
+<p>首先说说分片上传，我们在进行文件上传的时候，因为服务器的限制，会限制每一次上传到服务器的文件大小不会很大，这个时候我们就需要把一个需要上传的文件进行切割，然后分别进行上传到服务器。</p>
+</blockquote>
+<p>假如需要做到这一步，我们需要解决两个问题:</p>
+<ul>
+<li>怎么切割?</li>
+<li>怎么得知当前传输的进度?</li>
+</ul>
+<p>首先怎么切割的问题上面已经有过说明，因为File文件对象是继承与Blob对象的，因此File文件对象也拥有slice这个方法，我们可以使用这个方法将任何一个File文件进行切割。</p>
+<p>代码如下：</p>
+<pre><code>var BYTES_PER_CHUNK = 1024 * 1024; // 每个文件切片大小定为1MB .
+var blob = document.getElementById(&quot;file&quot;).files[0];
+var slices = Math.ceil(blob.size / BYTES_PER_CHUNK);
+var blobs = [];
+slices.forEach(function(item, index) {
+    blobs.push(blob.slice(index,index + 1));
+});
+</code></pre><p>通过上面的方法。我们就得到了一个切割之后的File对象组成的数组blobs；</p>
+<p>接下来要做的时候就是讲这些文件分别上传到服务器。</p>
+<p>在HTTP1.1以上的协议中，有Transfer-Encoding这个编码协议，用以和服务器通信，来得知当前分片传递的文件进程。</p>
+<p>这样解决了这两个问题，我们不仅可以对文件进行分片上传，并且能够得到文件上传的进度。</p>
+<h2 id="粘贴图片"><a href="#粘贴图片" class="headerlink" title="粘贴图片"></a>粘贴图片</h2><blockquote>
+<p>blob还有一个应用场景，就是获取剪切板上的数据来进行粘贴的操作。例如通过QQ截图后，需要在网页上进行粘贴操作。</p>
+</blockquote>
+<p>粘贴图片我们需要解决下面几个问题</p>
+<ol>
+<li><p>监听用户的粘贴操作</p>
+</li>
+<li><p>获取到剪切板上的数据</p>
+</li>
+<li><p>将获取到的数据渲染到网页中</p>
+</li>
+</ol>
+<p>首先我们可以通过paste事件来监听用户的粘贴操作:</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+});
+</code></pre><p>然后通过事件对象中的==clipboardData== 对象来获取图片的文件数据。</p>
+<h3 id="clipboardData对象介绍"><a href="#clipboardData对象介绍" class="headerlink" title="clipboardData对象介绍"></a>clipboardData对象介绍</h3><p>介绍一下 clipboardData 对象，它实际上是一个 DataTransfer 类型的对象， DataTransfer 是拖动产生的一个对象，但实际上粘贴事件也是它。</p>
+<h4 id="clipboardData-的属性介绍"><a href="#clipboardData-的属性介绍" class="headerlink" title="clipboardData 的属性介绍"></a>clipboardData 的属性介绍</h4><table>
+<thead>
+<tr>
+<th>属性</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dropEffect</td>
+<td style="text-align:center">String</td>
+<td style="text-align:right">默认是 none</td>
+</tr>
+<tr>
+<td>effectAllowed</td>
+<td style="text-align:center">String</td>
+<td style="text-align:right">默认是 uninitialized</td>
+</tr>
+<tr>
+<td>files</td>
+<td style="text-align:center">FileList</td>
+<td style="text-align:right">粘贴操作为空List</td>
+</tr>
+<tr>
+<td>items</td>
+<td style="text-align:center">DataTransferItemList</td>
+<td style="text-align:right">剪切板中的各项数据</td>
+</tr>
+<tr>
+<td>types</td>
+<td style="text-align:center">Array</td>
+<td style="text-align:right">剪切板中的数据类型 该属性在Safari下比较混乱</td>
+</tr>
+</tbody>
+</table>
+<h3 id="items-介绍"><a href="#items-介绍" class="headerlink" title="items 介绍"></a>items 介绍</h3><p>items 是一个 DataTransferItemList 对象，自然里面都是 DataTransferItem 类型的数据了。</p>
+<h4 id="属性-1"><a href="#属性-1" class="headerlink" title="属性"></a>属性</h4><p>items 的 DataTransferItem 有两个属性 kind 和 type</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>kind</td>
+<td style="text-align:center">一般为 string 或者 file</td>
+</tr>
+<tr>
+<td>type</td>
+<td style="text-align:center">具体的数据类型，例如具体是哪种类型字符串或者哪种类型的文件，即 MIME-Type</td>
+</tr>
+</tbody>
+</table>
+<h4 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h4><table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align:center">参数</th>
+<th style="text-align:right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>getAsFile</td>
+<td style="text-align:center">空</td>
+<td style="text-align:right">如果 kind 是 file ，可以用该方法获取到文件</td>
+</tr>
+<tr>
+<td>getAsString</td>
+<td style="text-align:center">function(str)</td>
+<td style="text-align:right">如果 kind 是 string ，可以用该方法获取到字符串str</td>
+</tr>
+</tbody>
+</table>
+<p>在原型上还有一些其他方法，不过在处理剪切板操作的时候一般用不到了。</p>
+<h4 id="type-介绍"><a href="#type-介绍" class="headerlink" title="type 介绍"></a>type 介绍</h4><p>一般 types 中常见的值有 text/plain 、 text/html 、 Files 。</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text/plain</td>
+<td style="text-align:center">普通字符串</td>
+</tr>
+<tr>
+<td>text/html</td>
+<td style="text-align:center">带有样式的html</td>
+</tr>
+<tr>
+<td>Files</td>
+<td style="text-align:center">文件(例如剪切板中的数据)</td>
+</tr>
+</tbody>
+</table>
+<p>有了上面这些方法，我们可以解决第二个问题即获取到剪切板上的数据。</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+    var cbd = e.clipboardData;
+    for(var i = 0; i &lt; cbd.items.length; i++) {
+        var item = cbd.items[i];
+        console.info(item);
+        if(item.kind == &quot;file&quot;){
+            var blob = item.getAsFile();
+            if (blob.size === 0) {
+                return;
+            }
+            console.info(blob);
+        }
+    }
+});
+</code></pre><p>最后我们需要将获取到的数据渲染到网页上。</p>
+<p>其实这个本质上就是一个类似于上传图片本地浏览的问题。我们可以直接通过HTML5的File接口将获取到的文件上传到服务器然后通过讲服务器返回的url地址来对图片进行渲染。也可以使用fileRender对象来进行图片本地浏览。</p>
+<h3 id="fileRender对象简介"><a href="#fileRender对象简介" class="headerlink" title="fileRender对象简介"></a>fileRender对象简介</h3><p>从Blob中读取内容的唯一方法是使用 FileReader。</p>
+<p>FileReader接口有4个方法，其中3个用来读取文件，另一个用来中断读取。无论读取成功或失败，方法并不会返回读取结果，这一结果存储在result属性中。</p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th style="text-align:center">参数</th>
+<th style="text-align:right">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>readAsBinaryString</td>
+<td style="text-align:center">file</td>
+<td style="text-align:right">将文件读取为二进制编码</td>
+</tr>
+<tr>
+<td>readAsText</td>
+<td style="text-align:center">file,[encoding]</td>
+<td style="text-align:right">将文件读取为文本</td>
+</tr>
+<tr>
+<td>readAsDataURL</td>
+<td style="text-align:center">file</td>
+<td style="text-align:right">将文件读取为DataURL</td>
+</tr>
+<tr>
+<td>abort</td>
+<td style="text-align:center">(none)</td>
+<td style="text-align:right">终端读取操作</td>
+</tr>
+</tbody>
+</table>
+<p>FileReader接口包含了一套完整的事件模型，用于捕获读取文件时的状态。</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>on<x>abort</x></td>
+<td style="text-align:center">中断</td>
+</tr>
+<tr>
+<td>on<x>error</x></td>
+<td style="text-align:center">出错</td>
+</tr>
+<tr>
+<td>on<x>loadstart</x></td>
+<td style="text-align:center">开始</td>
+</tr>
+<tr>
+<td>onprogress</td>
+<td style="text-align:center">正在读取</td>
+</tr>
+<tr>
+<td>on<x>load</x></td>
+<td style="text-align:center">成功读取</td>
+</tr>
+<tr>
+<td>on<x>loadend</x></td>
+<td style="text-align:center">读取完成，无论成功失败</td>
+</tr>
+</tbody>
+</table>
+<p>通过上面的方法以及事件，我们可以发现，通过readAsDataURL方法及on<x>load事件就可以拿到一个可本地浏览图片的DataURL。</x></p>
+<p>最终代码如下：</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+    var cbd = e.clipboardData;
+        var fr = new FileReader();
+        var html = &apos;&apos;;
+        for(var i = 0; i &lt; cbd.items.length; i++) {
+            var item = cbd.items[i];
+            console.info(item);
+            if(item.kind == &quot;file&quot;){
+                var blob = item.getAsFile();
+                if (blob.size === 0) {
+                    return;
+                }
+                console.info(blob);
+                fr.readAsDataURL(blob);
+                fr.on&lt;x&gt;load=function(e){
+                    var result=document.getElementById(&quot;result&quot;);
+                    //显示文件
+                    result.innerHTML=&apos;&lt;img src=&quot;&apos; + this.result +&apos;&quot; alt=&quot;&quot; /&gt;&apos;;
+                }
+            }
+        }
+});
+</code></pre><p>这样我们就可以监听到用户的粘贴操作，并且将用户粘贴的图片文件实时的渲染到网页之中了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上是我对Blob对象的一些学习分享，希望在实际应用上能对大家有所帮助。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/01/js 深拷贝和浅拷贝/" rel="next" title="js 深拷贝和浅拷贝">
+                <i class="fa fa-chevron-left"></i> js 深拷贝和浅拷贝
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/05/正向代理和反向代理/" rel="prev" title="正向代理和反向代理">
+                正向代理和反向代理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="赖宝" />
+          <p class="site-author-name" itemprop="name">赖宝</p>
+           
+              <p class="site-description motion-element" itemprop="description">努力学习</p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">25</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#blob对象介绍"><span class="nav-number">1.</span> <span class="nav-text">blob对象介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建blob对象"><span class="nav-number">1.1.</span> <span class="nav-text">创建blob对象</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#属性"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法"><span class="nav-number">1.1.0.2.</span> <span class="nav-text">方法</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#blob对象的使用"><span class="nav-number">2.</span> <span class="nav-text">blob对象的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#分片上传"><span class="nav-number">2.1.</span> <span class="nav-text">分片上传</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#粘贴图片"><span class="nav-number">2.2.</span> <span class="nav-text">粘贴图片</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#clipboardData对象介绍"><span class="nav-number">2.2.1.</span> <span class="nav-text">clipboardData对象介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#clipboardData-的属性介绍"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">clipboardData 的属性介绍</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#items-介绍"><span class="nav-number">2.2.2.</span> <span class="nav-text">items 介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#属性-1"><span class="nav-number">2.2.2.1.</span> <span class="nav-text">属性</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#方法-1"><span class="nav-number">2.2.2.2.</span> <span class="nav-text">方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#type-介绍"><span class="nav-number">2.2.2.3.</span> <span class="nav-text">type 介绍</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fileRender对象简介"><span class="nav-number">2.2.3.</span> <span class="nav-text">fileRender对象简介</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">赖宝</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

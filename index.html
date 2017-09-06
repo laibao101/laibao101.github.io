@@ -250,6 +250,729 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/详解export default与require和exports,export区别与联系/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/09/05/详解export default与require和exports,export区别与联系/" itemprop="url">
+                  详解export default与require和exports,export区别与联系
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="一、首先搞清楚一个基本问题："><a href="#一、首先搞清楚一个基本问题：" class="headerlink" title="一、首先搞清楚一个基本问题："></a>一、首先搞清楚一个基本问题：</h2><p>module.exports和exports是属于CommonJS模块规范！（<a href="http://javascript.ruanyifeng.com/nodejs/module.html" target="_blank" rel="external">不清楚commonjs?大神请这边逛一逛commonjs规范</a>）</p>
+<p>export和export default是属于ES6语法（不清楚ES6?大神请这边逛一逛ES6模块）！</p>
+<p>同样import和require分别属于ES6和CommonJS！</p>
+<h2 id="二、知道属于哪一块的语法了还有一个明确点："><a href="#二、知道属于哪一块的语法了还有一个明确点：" class="headerlink" title="二、知道属于哪一块的语法了还有一个明确点："></a>二、知道属于哪一块的语法了还有一个明确点：</h2><p>module.exports和exports、export和export default都是导出模块；</p>
+<p>import和require则是导入模块。</p>
+<p>所以现在就不要弄混了，module.exports导出对应require导入，export导出对应import导入。</p>
+<p>喂！等等，怎么才说到module.exports导出对应require导入，export导出对应import导入，那还有exports和export default呢！？那我们继续。</p>
+<h2 id="三、module-exports和exports的区别与联系"><a href="#三、module-exports和exports的区别与联系" class="headerlink" title="三、module.exports和exports的区别与联系"></a>三、module.exports和exports的区别与联系</h2><p>讲到这里就不得不稍微提一下模块化：</p>
+<p>Node应用由模块组成，采用CommonJS模块规范。</p>
+<p>根据这个规范，每个文件就是一个模块，有自己的作用域。在一个文件里面定义的变量、函数、类，都是私有的，对其他文件不可见。</p>
+<p>CommonJS规范规定，每个模块内部，module变量代表当前模块。这个变量是一个对象，它的exports属性（即module.exports）是对外的接口。加载某个模块，其实是加载该模块的module.exports属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> x = <span class="number">5</span>;</div><div class="line"><span class="keyword">var</span> addX = <span class="function"><span class="keyword">function</span>(<span class="params">value</span>) </span>&#123; <span class="keyword">return</span> value + x; &#125;;</div><div class="line"><span class="built_in">module</span>.exports.x = x;</div><div class="line"><span class="built_in">module</span>.exports.addX = addX;</div></pre></td></tr></table></figure>
+<p>上面代码通过module.exports输出变量x和函数addX。</p>
+<p>require方法用于加载模块。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> example = <span class="built_in">require</span>(<span class="string">'./example.js'</span>);</div><div class="line"><span class="built_in">console</span>.log(example.x); <span class="comment">// 5console.log(example.addX(1)); // 6</span></div></pre></td></tr></table></figure></p>
+<p>看了刚刚这段commonjs规范上面的介绍可以知道以下区别与联系：</p>
+<p>其实exports变量是指向module.exports，加载模块实际是加载该模块的module.exports。这等同在每个模块头部，有一行这样的命令。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> exports = <span class="built_in">module</span>.exports;</div></pre></td></tr></table></figure>
+<p>于是我们可以直接在 <code>exports</code> 对象上添加方法，表示对外输出的接口，如同在module.exports上添加一样。注意，不能直接将exports变量指向一个值，因为这样等于切断了exports与module.exports的联系。</p>
+<h2 id="三、export和export-default的区别与联系"><a href="#三、export和export-default的区别与联系" class="headerlink" title="三、export和export default的区别与联系"></a>三、export和export default的区别与联系</h2><p>模块功能主要由：export和import构成。export导出模块的对外接口，import命令导入其他模块暴露的接口。</p>
+<p>export其实和export default就是写法上面有点差别，一个是导出一个个单独接口，一个是默认导出一个整体接口。使用import命令的时候，用户需要知道所要加载的变量名或函数名，否则无法加载。这里就有一个简单写法不用去知道有哪些具体的暴露接口名，就用export default命令，为模块指定默认输出。</p>
+<p>export可以这样写<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// testA.js</span></div><div class="line"><span class="keyword">var</span> f = <span class="string">'Miel'</span>;</div><div class="line"><span class="keyword">var</span> name = <span class="string">'Jack'</span>;</div><div class="line"><span class="keyword">var</span> data= <span class="number">1988</span>;</div><div class="line"></div><div class="line"><span class="keyword">export</span> &#123;f, name, data&#125;;</div></pre></td></tr></table></figure></p>
+<p>使用export命令定义了模块的对外接口以后，其他 JS 文件就可以通过import命令加载这个模块。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// main.js</span></div><div class="line"><span class="keyword">import</span> &#123;f, name, data&#125; <span class="keyword">from</span> <span class="string">'./testA'</span>;</div></pre></td></tr></table></figure>
+<p>export default可以这样写</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// export-default.js</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'foo'</span>);</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>或者写成<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">foo</span>(<span class="params"></span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'foo'</span>);</div><div class="line">&#125;</div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> foo;</div><div class="line"><span class="comment">// import-default.js</span></div><div class="line"><span class="keyword">import</span> customName <span class="keyword">from</span> <span class="string">'./export-default'</span>;</div><div class="line">customName(); <span class="comment">// 'foo'</span></div></pre></td></tr></table></figure></p>
+<p>下面比较一下export default和export 输出。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 第一组</span></div><div class="line"><span class="keyword">export</span> <span class="keyword">default</span> <span class="function"><span class="keyword">function</span> <span class="title">car</span>(<span class="params"></span>) </span>&#123; <span class="comment">// 输出</span></div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">import</span> car <span class="keyword">from</span> <span class="string">'car'</span>; <span class="comment">// 输入</span></div><div class="line"></div><div class="line"><span class="comment">// 第二组</span></div><div class="line"><span class="keyword">export</span> <span class="function"><span class="keyword">function</span> <span class="title">car2</span>(<span class="params"></span>) </span>&#123; <span class="comment">// 输出</span></div><div class="line">  <span class="comment">// ...</span></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">import</span> &#123;car2&#125; <span class="keyword">from</span> <span class="string">'car2'</span>; <span class="comment">// 输入</span></div></pre></td></tr></table></figure></p>
+<p>可以看到第一组是使用export default，import语句不需要使用大括号；第二组使用export，对应的import语句需要使用大括号，一个模块只能有一个默认输出，所以export default只能使用一次。</p>
+<h2 id="四、import和require的区别与联系"><a href="#四、import和require的区别与联系" class="headerlink" title="四、import和require的区别与联系"></a>四、import和require的区别与联系</h2><p>看了上面其实已经清楚了，import和require是分别属于ES6和CommonJS的两种导入模块的语法而已。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/正向代理和反向代理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/09/05/正向代理和反向代理/" itemprop="url">
+                  正向代理和反向代理
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="正向代理和反向代理"><a href="#正向代理和反向代理" class="headerlink" title="正向代理和反向代理"></a>正向代理和反向代理</h1><p>最开始使用nginx相当懵，不清楚他的工作原理，最近在网上看了些相关资料，整理一下，方便理解和学习，首先从正向代理和反向代理开始。看了不少文章讲的都很绕，看了还是很晕，下面是知乎上的一篇文章，是我看过讲的比较清楚的一篇了。</p>
+<h2 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h2><p>1 正向代理</p>
+<p>正向代理是一个位于客户端和目标服务器之间的代理服务器(中间服务器)。为了从原始服务器取得内容，客户端向代理服务器发送一个请求，并且指定目标服务器，之后代理向目标服务器转交并且将获得的内容返回给客户端。正向代理的情况下客户端必须要进行一些特别的设置才能使用。</p>
+<p>2 反向代理</p>
+<p>反向代理正好相反。对于客户端来说，反向代理就好像目标服务器。并且客户端不需要进行任何设置。客户端向反向代理发送请求，接着反向代理判断请求走向何处，并将请求转交给客户端，使得这些内容就好似他自己一样，一次客户端并不会感知到反向代理后面的服务，也因此不需要客户端做任何设置，只需要把反向代理服务器当成真正的服务器就好了。</p>
+<h2 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h2><p>正向代理需要你主动设置代理服务器ip或者域名进行访问，由设置的服务器ip或者域名去获取访问内容并返回；而反向代理不需要你做任何设置，直接访问服务器真实ip或者域名，但是服务器内部会自动根据访问内容进行跳转及内容返回，你不知道它最终访问的是哪些机器。</p>
+<p>正向代理是代理客户端，为客户端收发请求，使真实客户端对服务器不可见；而反向代理是代理服务器端，为服务器收发请求，使真实服务器对客户端不可见。</p>
+<p>从上面的描述也能看得出来正向代理和反向代理最关键的两点区别：</p>
+<ul>
+<li>是否指定目标服务器</li>
+<li>客户端是否要做设置</li>
+</ul>
+<p>下面用一张图来表示两者的差异：</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912275000.jpeg" alt="剪贴板图片"></p>
+<p>正向代理中，proxy和client同属一个LAN，对server透明； 反向代理中，proxy和server同属一个LAN，对client透明。 实际上proxy在两种代理中做的事都是代为收发请求和响应，不过从结构上来看正好左右互换了下，所以把前者那种代理方式叫做正向代理，后者叫做反向代理。</p>
+<p>从用途上来区分：</p>
+<ul>
+<li>正向代理：正向代理用途是为了在防火墙内的局域网提供访问internet的途径。另外还可以使用缓冲特性减少网络使用率</li>
+<li>反向代理：反向代理的用途是将防火墙后面的服务器提供给internet用户访问。同时还可以完成诸如负载均衡等功能</li>
+</ul>
+<p>从安全性来讲：</p>
+<ul>
+<li>正向代理：正向代理允许客户端通过它访问任意网站并且隐蔽客户端自身，因此你必须采取安全措施来确保仅为经过授权的客户端提供服务</li>
+<li>反向代理：对外是透明的，访问者并不知道自己访问的是代理。对访问者而言，他以为访问的就是原始服务器</li>
+</ul>
+<h2 id="使用场景"><a href="#使用场景" class="headerlink" title="使用场景"></a>使用场景</h2><p>正向代理的典型用途是为在防火墙内的局域网客户端提供访问Internet的途径。正向代理还可以使用缓冲特性减少网络使用率。反向代理的典型用途是将防火墙后面的服务器提供给Internet用户访问。反向代理还可以为后端的多台服务器提供负载平衡，或为后端较慢的服务器提供缓冲服务。</p>
+<p>1 从上面的介绍也就可以猜出来正向代理的至少一个功能（俗称翻墙），也即：用户A无法访问facebook，但是能访问服务器B，而服务器B可以访问facebook。于是用户A访问服务器B，通过服务器B去访问facebook，，服务器B收到请求后，去访问facebook，facebook把响应信息返回给服务器B，服务器B再把响应信息返回给A。这样，通过代理服务器B，就实现了翻墙。</p>
+<p>2 从上面的介绍也可以猜出来反向代理的至少一个功能（比如负载均衡），也即：假设用户A访问 www.somesite.com/something.html，但www.somesite.com’上并不存在something.html页面，于是接收用户请求的该服务器就偷偷从另外一台服务器上取回来，然后返回给用户，而用户并不知道something.html页面究竟位于哪台机器上。</p>
+<p>3 反向代理的作用就比较多了，这里简单列举一下：</p>
+<ul>
+<li>保护和隐藏原始资源服务器</li>
+<li>加密和SSL加速</li>
+<li>负载均衡</li>
+<li>缓存静态内容</li>
+<li>压缩</li>
+<li>减速上传</li>
+<li>安全</li>
+<li>外网发布</li>
+</ul>
+<p>下面做两个简单介绍</p>
+<p>1 保护和隐藏原始资源服务器</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912826000.jpeg" alt="剪贴板图片"></p>
+<p>用户A始终认为它访问的是原始服务器B而不是代理服务器Z，但实用际上反向代理服务器接受用户A的应答，从原始资源服务器B中取得用户A的需求资源，然后发送给用户A。由于防火墙的作用，只允许代理服务器Z访问原始资源服务器B。尽管在这个虚拟的环境下，防火墙和反向代理的共同作用保护了原始资源服务器B，但用户A并不知情。</p>
+<p>2 负载均衡</p>
+<p><img src="http://eden.dz11.com/xupload/xupload_1501912892000.jpeg" alt="剪贴板图片"></p>
+<p>当反向代理服务器不止一个的时候，我们甚至可以把它们做成集群，当更多的用户访问资源服务器B的时候，让不同的代理服务器Z（x）去应答不同的用户，然后发送不同用户需要的资源。</p>
+<h2 id="透明代理"><a href="#透明代理" class="headerlink" title="透明代理"></a>透明代理</h2><p>透明代理比较类似正向代理的功能，差别在于客户端根本不知道代理的存在，它改编你的request，并会传送真实IP（使用场景就是公司限制网络的访问）。</p>
+<p>比如为了工作效率或者安全，A公司屏蔽了QQ软件的使用。A公司的员工接上了网络，但发现无法使用qq。这就是透明代理捣的鬼。公司在内网和外网的中间插入一个透明代理，这个代理会根据规则抓取请求内容，遇到qq的请求我就把这个请求给屏蔽掉，这样就完成了透明屏蔽。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/05/blob对象介绍/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="赖宝">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="赖宝的宝">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/09/05/blob对象介绍/" itemprop="url">
+                  blob对象介绍
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T00:00:00+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="blob对象介绍"><a href="#blob对象介绍" class="headerlink" title="blob对象介绍"></a>blob对象介绍</h1><p>一个 Blob对象表示一个不可变的, 原始数据的类似文件对象。Blob表示的数据不一定是一个JavaScript原生格式<br>blob对象本质上是js中的一个对象，里面可以储存大量的二进制编码格式的数据。</p>
+<hr>
+<h2 id="创建blob对象"><a href="#创建blob对象" class="headerlink" title="创建blob对象"></a>创建blob对象</h2><p>创建blob对象本质上和创建一个其他对象的方式是一样的，都是使用Blob() 的构造函数来进行创建。<br>构造函数接受两个参数：</p>
+<p>第一个参数为一个数据序列，可以是任意格式的值。</p>
+<p>第二个参数是一个包含两个属性的对象{<br>type: MIME的类型,<br>endings: 决定第一个参数的数据格式，可以取值为 “transparent” 或者 “native”（transparent的话不变，是默认值，native 的话按操作系统转换） 。<br>}</p>
+<p>Blob()构造函数允许使用其他对象创建一个Blob对象，比如用字符串构建一个blob</p>
+<pre><code>var debug = {hello: &quot;world&quot;};
+var blob = new Blob([JSON.stringify(debug, null, 2)],
+  {type : &apos;application/json&apos;});
+</code></pre><p>既然是对象，那么blob也拥有自己的属性以及方法</p>
+<h4 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h4><ul>
+<li><p>Blob.isClosed (只读)</p>
+<p>  布尔值，指示 Blob.close() 是否在该对象上调用过。 关闭的 blob 对象不可读。</p>
+</li>
+<li><p>Blob.size (只读)</p>
+<p>  Blob 对象中所包含数据的大小（字节）。</p>
+</li>
+<li><p>Blob.type (只读)</p>
+<p>  一个字符串，表明该Blob对象所包含数据的MIME类型。如果类型未知，则该值为空字符串。</p>
+</li>
+</ul>
+<h4 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h4><ul>
+<li><p>Blob.close() </p>
+<p>  关闭 Blob 对象，以便能释放底层资源。</p>
+</li>
+<li><p>Blob.slice([start[, end[, contentType]]])</p>
+<p>  返回一个新的 Blob 对象，包含了源 Blob<br>对象中指定范围内的数据。其实就是对这个blob中的数据进行切割，我们在对文件进行分片上传的时候需要使用到这个方法。</p>
+</li>
+</ul>
+<p>看到上面这些方法和属性，使用过HTML5提供的File接口的应该都很熟悉，这些属性和方法在File接口中也都有。<br>其实File接口就是基于Blob，继承blob功能并将其扩展为支持用户系统上的文件，也就是说：</p>
+<p>==File接口中的Flie对象就是继承与Blob对象==。</p>
+<h1 id="blob对象的使用"><a href="#blob对象的使用" class="headerlink" title="blob对象的使用"></a>blob对象的使用</h1><p>上面说了很多关于Blob对象的一些概念性的东西，下面我们来看看实际用途。</p>
+<hr>
+<h2 id="分片上传"><a href="#分片上传" class="headerlink" title="分片上传"></a>分片上传</h2><blockquote>
+<p>首先说说分片上传，我们在进行文件上传的时候，因为服务器的限制，会限制每一次上传到服务器的文件大小不会很大，这个时候我们就需要把一个需要上传的文件进行切割，然后分别进行上传到服务器。</p>
+</blockquote>
+<p>假如需要做到这一步，我们需要解决两个问题:</p>
+<ul>
+<li>怎么切割?</li>
+<li>怎么得知当前传输的进度?</li>
+</ul>
+<p>首先怎么切割的问题上面已经有过说明，因为File文件对象是继承与Blob对象的，因此File文件对象也拥有slice这个方法，我们可以使用这个方法将任何一个File文件进行切割。</p>
+<p>代码如下：</p>
+<pre><code>var BYTES_PER_CHUNK = 1024 * 1024; // 每个文件切片大小定为1MB .
+var blob = document.getElementById(&quot;file&quot;).files[0];
+var slices = Math.ceil(blob.size / BYTES_PER_CHUNK);
+var blobs = [];
+slices.forEach(function(item, index) {
+    blobs.push(blob.slice(index,index + 1));
+});
+</code></pre><p>通过上面的方法。我们就得到了一个切割之后的File对象组成的数组blobs；</p>
+<p>接下来要做的时候就是讲这些文件分别上传到服务器。</p>
+<p>在HTTP1.1以上的协议中，有Transfer-Encoding这个编码协议，用以和服务器通信，来得知当前分片传递的文件进程。</p>
+<p>这样解决了这两个问题，我们不仅可以对文件进行分片上传，并且能够得到文件上传的进度。</p>
+<h2 id="粘贴图片"><a href="#粘贴图片" class="headerlink" title="粘贴图片"></a>粘贴图片</h2><blockquote>
+<p>blob还有一个应用场景，就是获取剪切板上的数据来进行粘贴的操作。例如通过QQ截图后，需要在网页上进行粘贴操作。</p>
+</blockquote>
+<p>粘贴图片我们需要解决下面几个问题</p>
+<ol>
+<li><p>监听用户的粘贴操作</p>
+</li>
+<li><p>获取到剪切板上的数据</p>
+</li>
+<li><p>将获取到的数据渲染到网页中</p>
+</li>
+</ol>
+<p>首先我们可以通过paste事件来监听用户的粘贴操作:</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+});
+</code></pre><p>然后通过事件对象中的==clipboardData== 对象来获取图片的文件数据。</p>
+<h3 id="clipboardData对象介绍"><a href="#clipboardData对象介绍" class="headerlink" title="clipboardData对象介绍"></a>clipboardData对象介绍</h3><p>介绍一下 clipboardData 对象，它实际上是一个 DataTransfer 类型的对象， DataTransfer 是拖动产生的一个对象，但实际上粘贴事件也是它。</p>
+<h4 id="clipboardData-的属性介绍"><a href="#clipboardData-的属性介绍" class="headerlink" title="clipboardData 的属性介绍"></a>clipboardData 的属性介绍</h4><table>
+<thead>
+<tr>
+<th>属性</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dropEffect</td>
+<td style="text-align:center">String</td>
+<td style="text-align:right">默认是 none</td>
+</tr>
+<tr>
+<td>effectAllowed</td>
+<td style="text-align:center">String</td>
+<td style="text-align:right">默认是 uninitialized</td>
+</tr>
+<tr>
+<td>files</td>
+<td style="text-align:center">FileList</td>
+<td style="text-align:right">粘贴操作为空List</td>
+</tr>
+<tr>
+<td>items</td>
+<td style="text-align:center">DataTransferItemList</td>
+<td style="text-align:right">剪切板中的各项数据</td>
+</tr>
+<tr>
+<td>types</td>
+<td style="text-align:center">Array</td>
+<td style="text-align:right">剪切板中的数据类型 该属性在Safari下比较混乱</td>
+</tr>
+</tbody>
+</table>
+<h3 id="items-介绍"><a href="#items-介绍" class="headerlink" title="items 介绍"></a>items 介绍</h3><p>items 是一个 DataTransferItemList 对象，自然里面都是 DataTransferItem 类型的数据了。</p>
+<h4 id="属性-1"><a href="#属性-1" class="headerlink" title="属性"></a>属性</h4><p>items 的 DataTransferItem 有两个属性 kind 和 type</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>kind</td>
+<td style="text-align:center">一般为 string 或者 file</td>
+</tr>
+<tr>
+<td>type</td>
+<td style="text-align:center">具体的数据类型，例如具体是哪种类型字符串或者哪种类型的文件，即 MIME-Type</td>
+</tr>
+</tbody>
+</table>
+<h4 id="方法-1"><a href="#方法-1" class="headerlink" title="方法"></a>方法</h4><table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align:center">参数</th>
+<th style="text-align:right">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>getAsFile</td>
+<td style="text-align:center">空</td>
+<td style="text-align:right">如果 kind 是 file ，可以用该方法获取到文件</td>
+</tr>
+<tr>
+<td>getAsString</td>
+<td style="text-align:center">function(str)</td>
+<td style="text-align:right">如果 kind 是 string ，可以用该方法获取到字符串str</td>
+</tr>
+</tbody>
+</table>
+<p>在原型上还有一些其他方法，不过在处理剪切板操作的时候一般用不到了。</p>
+<h4 id="type-介绍"><a href="#type-介绍" class="headerlink" title="type 介绍"></a>type 介绍</h4><p>一般 types 中常见的值有 text/plain 、 text/html 、 Files 。</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>text/plain</td>
+<td style="text-align:center">普通字符串</td>
+</tr>
+<tr>
+<td>text/html</td>
+<td style="text-align:center">带有样式的html</td>
+</tr>
+<tr>
+<td>Files</td>
+<td style="text-align:center">文件(例如剪切板中的数据)</td>
+</tr>
+</tbody>
+</table>
+<p>有了上面这些方法，我们可以解决第二个问题即获取到剪切板上的数据。</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+    var cbd = e.clipboardData;
+    for(var i = 0; i &lt; cbd.items.length; i++) {
+        var item = cbd.items[i];
+        console.info(item);
+        if(item.kind == &quot;file&quot;){
+            var blob = item.getAsFile();
+            if (blob.size === 0) {
+                return;
+            }
+            console.info(blob);
+        }
+    }
+});
+</code></pre><p>最后我们需要将获取到的数据渲染到网页上。</p>
+<p>其实这个本质上就是一个类似于上传图片本地浏览的问题。我们可以直接通过HTML5的File接口将获取到的文件上传到服务器然后通过讲服务器返回的url地址来对图片进行渲染。也可以使用fileRender对象来进行图片本地浏览。</p>
+<h3 id="fileRender对象简介"><a href="#fileRender对象简介" class="headerlink" title="fileRender对象简介"></a>fileRender对象简介</h3><p>从Blob中读取内容的唯一方法是使用 FileReader。</p>
+<p>FileReader接口有4个方法，其中3个用来读取文件，另一个用来中断读取。无论读取成功或失败，方法并不会返回读取结果，这一结果存储在result属性中。</p>
+<table>
+<thead>
+<tr>
+<th>方法名</th>
+<th style="text-align:center">参数</th>
+<th style="text-align:right">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>readAsBinaryString</td>
+<td style="text-align:center">file</td>
+<td style="text-align:right">将文件读取为二进制编码</td>
+</tr>
+<tr>
+<td>readAsText</td>
+<td style="text-align:center">file,[encoding]</td>
+<td style="text-align:right">将文件读取为文本</td>
+</tr>
+<tr>
+<td>readAsDataURL</td>
+<td style="text-align:center">file</td>
+<td style="text-align:right">将文件读取为DataURL</td>
+</tr>
+<tr>
+<td>abort</td>
+<td style="text-align:center">(none)</td>
+<td style="text-align:right">终端读取操作</td>
+</tr>
+</tbody>
+</table>
+<p>FileReader接口包含了一套完整的事件模型，用于捕获读取文件时的状态。</p>
+<table>
+<thead>
+<tr>
+<th>事件</th>
+<th style="text-align:center">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>on<x>abort</x></td>
+<td style="text-align:center">中断</td>
+</tr>
+<tr>
+<td>on<x>error</x></td>
+<td style="text-align:center">出错</td>
+</tr>
+<tr>
+<td>on<x>loadstart</x></td>
+<td style="text-align:center">开始</td>
+</tr>
+<tr>
+<td>onprogress</td>
+<td style="text-align:center">正在读取</td>
+</tr>
+<tr>
+<td>on<x>load</x></td>
+<td style="text-align:center">成功读取</td>
+</tr>
+<tr>
+<td>on<x>loadend</x></td>
+<td style="text-align:center">读取完成，无论成功失败</td>
+</tr>
+</tbody>
+</table>
+<p>通过上面的方法以及事件，我们可以发现，通过readAsDataURL方法及on<x>load事件就可以拿到一个可本地浏览图片的DataURL。</x></p>
+<p>最终代码如下：</p>
+<pre><code>document.addEventListener(&apos;paste&apos;, function (e) {
+    console.info(e);
+    var cbd = e.clipboardData;
+        var fr = new FileReader();
+        var html = &apos;&apos;;
+        for(var i = 0; i &lt; cbd.items.length; i++) {
+            var item = cbd.items[i];
+            console.info(item);
+            if(item.kind == &quot;file&quot;){
+                var blob = item.getAsFile();
+                if (blob.size === 0) {
+                    return;
+                }
+                console.info(blob);
+                fr.readAsDataURL(blob);
+                fr.on&lt;x&gt;load=function(e){
+                    var result=document.getElementById(&quot;result&quot;);
+                    //显示文件
+                    result.innerHTML=&apos;&lt;img src=&quot;&apos; + this.result +&apos;&quot; alt=&quot;&quot; /&gt;&apos;;
+                }
+            }
+        }
+});
+</code></pre><p>这样我们就可以监听到用户的粘贴操作，并且将用户粘贴的图片文件实时的渲染到网页之中了。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上是我对Blob对象的一些学习分享，希望在实际应用上能对大家有所帮助。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/09/01/js 深拷贝和浅拷贝/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1726,478 +2449,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/20/在浏览器地址栏输入url，按下回车后究竟发生了什么？/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/20/在浏览器地址栏输入url，按下回车后究竟发生了什么？/" itemprop="url">
-                  在浏览器地址栏输入url,按下回车后究竟发生了什么?
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-20T00:00:00+08:00">
-                2017-07-20
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1.背景介绍"></a>1.背景介绍</h2><p>当你在浏览器地址栏输入一个URL后回车，将会发生的事情？这是一道经典的面试题，同时也是一道复杂的题目，涉及到很多东西，不同的软件开发者对于此道问题有不同的答案，对于其中的某一点也能无限深究，今天我们就来侧重于web前端来看一下究竟发生了什么。</p>
-<h2 id="2-知识剖析"><a href="#2-知识剖析" class="headerlink" title="2.知识剖析"></a>2.知识剖析</h2><h3 id="基本流程："><a href="#基本流程：" class="headerlink" title="基本流程："></a>基本流程：</h3><p>①查询ip地址</p>
-<p>②建立tcp连接，接入服务器</p>
-<p>③浏览器发起http请求</p>
-<p>④服务器后台操作并做出响应</p>
-<p>⑤网页的解析与渲染</p>
-<h2 id="3-解决方案"><a href="#3-解决方案" class="headerlink" title="3.解决方案"></a>3.解决方案</h2><h3 id="查询ip地址"><a href="#查询ip地址" class="headerlink" title="查询ip地址"></a>查询ip地址</h3><p>①浏览器解析出url中的域名。</p>
-<p>②查询浏览器的DNS缓存。</p>
-<p>③浏览器中没有DNS缓存，则查找本地客户端hosts文件有无对应的ip地址。</p>
-<p>④hosts中无，则查找本地DNS服务器（运营商提供的DNS服务器）有无对应的DNS缓存。</p>
-<p>⑤若本地DNS没有DNS缓存，则向根服务器查询，进行递归查找。</p>
-<p>⑥递归查找从顶级域名开始（如.com）,一步步缩小范围，最终客户端取得ip地址。</p>
-<h3 id="tcp连接与http连接"><a href="#tcp连接与http连接" class="headerlink" title="tcp连接与http连接"></a>tcp连接与http连接</h3><p>①http协议建立在tcp协议之上，http请求前，需先进行tcp连接，形成客户端到服。</p>
-<p>②务器的稳定的通道。俗称TCP的三次握手。</p>
-<p>③tcp连接完成后，http请求开始，请求有多种方式，常见的有get，post等。</p>
-<p>④http请求包含请求头，也可能包含请求体两部分，请求头中包含我们希望对请求文件的操作的信息，请求体中包含传递给后台的参数。</p>
-<p>⑤服务器收到http请求后，后台开始工作，如负载平衡，跨域等，这里就是后端的工作了。</p>
-<p>⑥文件处理完毕，生成响应数据包，响应也包含两部分，响应头和相应体，响应体就是我们所请求的文件。</p>
-<p>⑦经过网络传输，文件被下载到本地客户端，客户端开始加载。</p>
-<h3 id="html渲染"><a href="#html渲染" class="headerlink" title="html渲染"></a>html渲染</h3><p>①客户端浏览器加载了html文件后，由上到下解析html为DOM树（DOM Tree）。</p>
-<p>②遇到css文件，css中的url发起http请求。</p>
-<p>③这是第二次http请求，由于http1.1协议增加了Connection: keep-alive声明，故tcp连接不会关闭，可以复用。</p>
-<p>④http连接是无状态连接，客户端与服务器端需要重新发起请求–响应。</p>
-<p>在请求css的过程中，解析器继续解析html，然后到了script标签。</p>
-<p>⑤由于script可能会改变DOM结构，故解析器停止生成DOM树，解析器被js阻塞，等待js文件发起http请求，然后加载。这是第三次http请求。js执行完成后解析器继续解析。</p>
-<p>⑥由于css文件可能会影响js文件的执行结果，因此需等css文件加载完成后再执行。</p>
-<p>⑦浏览器收到css文件后，开始解析css文件为CSSOM树（CSS Rule Tree）。</p>
-<p>⑧CSSOM树生成后，DOM Tree与CSS Rule Tree结合生成渲染树（Render Tree）。</p>
-<p>⑨Render Tree会被css文件阻塞，渲染树生成后，先布局，绘制渲染树中节点的属性(位置，宽度，大小等)，然后渲染，页面就会呈现信息。</p>
-<p>⑩继续边解析边渲染，遇到了另一个js文件，js文件执行后改变了DOM树，渲染树从被改变的dom开始再次渲染。</p>
-<p>⑪继续向下渲染，碰到一个img标签，浏览器发起http请求，不会等待img加载完成，继续向下渲染，之后再重新渲染此部分。</p>
-<p>⑫DOM树遇到html结束标签，停止解析，进而渲染结束。</p>
-<h2 id="4-扩展思考"><a href="#4-扩展思考" class="headerlink" title="4.扩展思考"></a>4.扩展思考</h2><h3 id="有那些网站优化的方法？"><a href="#有那些网站优化的方法？" class="headerlink" title="有那些网站优化的方法？"></a>有那些网站优化的方法？</h3><p>①减少DNS查询:将服务器域名的ip信息加入本地host文件。</p>
-<p>②减少http请求数量，对于图片使用雪碧图,对于html文件和css文件，js文件分别进行合并操作。</p>
-<p>③减少下载时间：压缩图片，使用压缩应用压缩文档中的空格，删除文件多余的语句和注释，创造自己的js精简库和精简框架,使用本地浏览器缓存。</p>
-<p>④提前渲染开始时间：将css链接放在html头部。</p>
-<p>⑤减轻解析器的阻塞：将js链接放在body尾部。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/15/2分钟学会数据mock，独立于后端开发/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/15/2分钟学会数据mock，独立于后端开发/" itemprop="url">
-                  2分钟学会数据mock，独立于后端开发
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-15T12:47:44+08:00">
-                2017-07-15
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>为什么说两分钟就能学会？ 因为你看完这篇文章只需要两分钟。</p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
-<li>相对于其他同类的框架的实现，mock.js超出了大家的意料。</li>
-</ul>
-<ol>
-<li>基于 数据模板 生成模拟数据。</li>
-<li>基于 HTML模板 生成模拟数据。</li>
-<li>拦截并模拟 ajax 请求。</li>
-</ol>
-<ul>
-<li>是的，mock.js只做上述的几件事，但做的足够出色。</li>
-</ul>
-<h2 id="解决的问题"><a href="#解决的问题" class="headerlink" title="解决的问题"></a>解决的问题</h2><p>开发时，后端还没完成数据输出，前端只好写静态模拟数据。</p>
-<ul>
-<li>数据太长了，将数据写在js文件里，完成后挨个改url。</li>
-<li>某些逻辑复杂的代码，加入或去除模拟数据时得小心翼翼。</li>
-<li>想要尽可能还原真实的数据，要么编写更多代码，要么手动修改模拟数据。</li>
-<li>特殊的格式，例如IP,随机数，图片，地址，需要去收集。</li>
-<li>超烂的破网速…</li>
-<li>…</li>
-</ul>
-<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>安装太简单，跳过</p>
-<h2 id="mockjs基本语法"><a href="#mockjs基本语法" class="headerlink" title="mockjs基本语法"></a>mockjs基本语法</h2><p>数据模板中的每个属性由 3 部分构成：属性名、生成规则、属性值：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 属性名   name</span></div><div class="line"><span class="comment">// 生成规则 rule</span></div><div class="line"><span class="comment">// 属性值   value</span></div><div class="line"><span class="string">'name|rule'</span>: value</div><div class="line">注意：</div><div class="line"></div><div class="line">属性名 和 生成规则 之间用竖线 | 分隔。</div><div class="line">生成规则 是可选的。</div><div class="line">生成规则 有 <span class="number">7</span> 种格式：</div><div class="line"><span class="string">'name|min-max'</span>: value</div><div class="line"><span class="string">'name|count'</span>: value</div><div class="line"><span class="string">'name|min-max.dmin-dmax'</span>: value</div><div class="line"><span class="string">'name|min-max.dcount'</span>: value</div><div class="line"><span class="string">'name|count.dmin-dmax'</span>: value</div><div class="line"><span class="string">'name|count.dcount'</span>: value</div><div class="line"><span class="string">'name|+step'</span>: value</div><div class="line">生成规则 的 含义 需要依赖 属性值的类型 才能确定。</div><div class="line">属性值 中可以含有 @占位符。</div><div class="line">属性值 还指定了最终值的初始值和类型。</div></pre></td></tr></table></figure></p>
-<h2 id="mockjs-官网"><a href="#mockjs-官网" class="headerlink" title="mockjs 官网"></a>mockjs 官网</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">http://mockjs.com/</div></pre></td></tr></table></figure>
-<h2 id="配置模拟数据"><a href="#配置模拟数据" class="headerlink" title="配置模拟数据"></a>配置模拟数据</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">Mock.mock(<span class="string">'http://g.cn'</span>, &#123;</div><div class="line">    <span class="string">'name'</span>     : <span class="string">'@cname'</span>,</div><div class="line">    <span class="string">'age|1-100'</span>: <span class="number">100</span>,</div><div class="line">    <span class="string">'color'</span>    : <span class="string">'@color'</span></div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="发送ajax请求-jquery版"><a href="#发送ajax请求-jquery版" class="headerlink" title="发送ajax请求(jquery版)"></a>发送ajax请求(jquery版)</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">$.ajax(&#123;</div><div class="line">    <span class="attr">url</span>: <span class="string">'http://g.cn'</span>,</div><div class="line">&#125;).done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>)</span>&#123;</div><div class="line">    <span class="built_in">console</span>.log(</div><div class="line">        <span class="built_in">JSON</span>.stringify(data, <span class="literal">null</span>, <span class="number">4</span>)</div><div class="line">    )    </div><div class="line">&#125;);</div></pre></td></tr></table></figure>
-<h2 id="查看响应的结果"><a href="#查看响应的结果" class="headerlink" title="查看响应的结果"></a>查看响应的结果</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 结果1</span></div><div class="line">&#123;</div><div class="line">    <span class="string">"name"</span>: <span class="string">"Elizabeth Hall"</span>,</div><div class="line">    <span class="string">"age"</span>: <span class="number">91</span>,</div><div class="line">    <span class="string">"color"</span>: <span class="string">"#0e64ea"</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 结果2</span></div><div class="line">&#123;</div><div class="line">    <span class="string">"name"</span>: <span class="string">"Michael Taylor"</span>,</div><div class="line">    <span class="string">"age"</span>: <span class="number">61</span>,</div><div class="line">    <span class="string">"color"</span>: <span class="string">"#081086"</span></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="comment">// 结果N ..</span></div></pre></td></tr></table></figure>
-<h3 id="数据模板用法"><a href="#数据模板用法" class="headerlink" title="数据模板用法"></a>数据模板用法</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> template = &#123;</div><div class="line">    <span class="string">'/admin/a1'</span>: &#123;</div><div class="line">        <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">        <span class="attr">msg</span>: <span class="string">'成功'</span>,</div><div class="line">        <span class="attr">data</span>: &#123;&#125;,</div><div class="line">    &#125;,</div><div class="line">    <span class="string">'/admin/a2'</span>: &#123;</div><div class="line">        <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">        <span class="attr">msg</span>: <span class="string">'成功'</span>,</div><div class="line">        <span class="attr">data</span>: &#123;</div><div class="line">            <span class="attr">name</span>: <span class="string">'@cname'</span>,</div><div class="line">            <span class="attr">address</span>: <span class="string">'@province'</span>,</div><div class="line">            <span class="attr">email</span>: <span class="string">'@email'</span>,</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;;</div><div class="line"></div><div class="line"><span class="keyword">for</span> (key <span class="keyword">in</span> template) &#123;</div><div class="line">    <span class="keyword">if</span> (template.hasOwnProperty(key)) &#123;</div><div class="line">        Mock.mock(key, template[key]);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">$.ajax(&#123;</div><div class="line">        <span class="attr">url</span>: <span class="string">'/admin/a2'</span></div><div class="line">    &#125;)</div><div class="line">    .done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'%s'</span>, <span class="string">'这是a2'</span>, data)</div><div class="line">    &#125;);</div><div class="line">$.ajax(&#123;</div><div class="line">        <span class="attr">url</span>: <span class="string">'/admin/a1'</span></div><div class="line">    &#125;)</div><div class="line">    .done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(<span class="string">'%s'</span>, <span class="string">'这是a1'</span>, data)</div><div class="line">    &#125;);</div></pre></td></tr></table></figure>
-<h2 id="高级用法（根据请求方法来返回数据）"><a href="#高级用法（根据请求方法来返回数据）" class="headerlink" title="高级用法（根据请求方法来返回数据）"></a>高级用法（根据请求方法来返回数据）</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> template = &#123;</div><div class="line">    <span class="string">'/admin'</span>: <span class="function"><span class="keyword">function</span>(<span class="params">req</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (req.type === <span class="string">'GET'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">"接到get请求"</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (req.type === <span class="string">'POST'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">'接到post请求'</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"><span class="keyword">for</span> (key <span class="keyword">in</span> template) &#123;</div><div class="line">    <span class="keyword">if</span> (template.hasOwnProperty(key)) &#123;</div><div class="line">        Mock.mock(key, template[key]);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">$.ajax(&#123;</div><div class="line">        <span class="attr">url</span>: <span class="string">'/admin'</span>,</div><div class="line">        <span class="attr">type</span>: <span class="string">'post'</span></div><div class="line">    &#125;)</div><div class="line">    .done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(data)</div><div class="line">    &#125;)</div></pre></td></tr></table></figure>
-<h3 id="高级用法（根据请求参数来返回数据）"><a href="#高级用法（根据请求参数来返回数据）" class="headerlink" title="高级用法（根据请求参数来返回数据）"></a>高级用法（根据请求参数来返回数据）</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> template = &#123;</div><div class="line">    <span class="string">'/admin'</span>: <span class="function"><span class="keyword">function</span>(<span class="params">req</span>) </span>&#123;</div><div class="line">        <span class="keyword">var</span> param = str2obj(req.body);</div><div class="line">        <span class="keyword">if</span> (param.type === <span class="string">'1'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">"type是1"</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (param.type === <span class="string">'2'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">"type是2"</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line"></div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">str2obj</span>(<span class="params">str</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> obj = &#123;&#125;;</div><div class="line">    <span class="keyword">var</span> reg = <span class="regexp">/(\w+)=(\w+)/ig</span>;</div><div class="line">    str.replace(reg, <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</div><div class="line">        obj[b] = c;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> obj;</div><div class="line">&#125;</div><div class="line"><span class="keyword">for</span> (key <span class="keyword">in</span> template) &#123;</div><div class="line">    <span class="keyword">if</span> (template.hasOwnProperty(key)) &#123;</div><div class="line">        Mock.mock(key, template[key]);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line"></div><div class="line">$.ajax(&#123;</div><div class="line">        <span class="attr">url</span>: <span class="string">'/admin'</span>,</div><div class="line">        <span class="attr">type</span>: <span class="string">'post'</span>,</div><div class="line">        <span class="attr">data</span>: &#123;</div><div class="line">            <span class="attr">type</span>: <span class="number">2</span>,</div><div class="line">            <span class="attr">status</span>: <span class="number">0</span></div><div class="line">        &#125;</div><div class="line">    &#125;)</div><div class="line">    .done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(data)</div><div class="line">    &#125;)</div></pre></td></tr></table></figure>
-<h2 id="高级用法（特殊处理get请求）"><a href="#高级用法（特殊处理get请求）" class="headerlink" title="高级用法（特殊处理get请求）"></a>高级用法（特殊处理get请求）</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> template = &#123;</div><div class="line">    <span class="string">'/admin'</span>: <span class="function"><span class="keyword">function</span>(<span class="params">req</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(req)</div><div class="line">        <span class="keyword">var</span> param = str2obj(req.url);</div><div class="line">        <span class="keyword">if</span> (param.type === <span class="string">'1'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">"type是1"</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (param.type === <span class="string">'2'</span>) &#123;</div><div class="line">            <span class="keyword">return</span> &#123;</div><div class="line">                <span class="attr">code</span>: <span class="number">1</span>,</div><div class="line">                <span class="attr">msg</span>: <span class="string">"type是2"</span>,</div><div class="line">                <span class="attr">data</span>: &#123;&#125;</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line"></div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">str2obj</span>(<span class="params">str</span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> obj = &#123;&#125;;</div><div class="line">    <span class="keyword">var</span> reg = <span class="regexp">/(\w+)=(\w+)/ig</span>;</div><div class="line">    str.replace(reg, <span class="function"><span class="keyword">function</span>(<span class="params">a, b, c</span>) </span>&#123;</div><div class="line">        obj[b] = c;</div><div class="line">    &#125;);</div><div class="line">    <span class="keyword">return</span> obj;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="keyword">for</span> (key <span class="keyword">in</span> template) &#123;</div><div class="line">    <span class="keyword">if</span> (template.hasOwnProperty(key)) &#123;</div><div class="line">        <span class="keyword">var</span> url = <span class="keyword">new</span> <span class="built_in">RegExp</span>(key);</div><div class="line">        Mock.mock(url, template[key]);</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line">$.ajax(&#123;</div><div class="line">        <span class="attr">url</span>: <span class="string">'/admin'</span>,</div><div class="line">        <span class="attr">type</span>: <span class="string">'get'</span>,</div><div class="line">        <span class="attr">data</span>: &#123;</div><div class="line">            <span class="attr">type</span>: <span class="number">2</span>,</div><div class="line">            <span class="attr">status</span>: <span class="number">0</span></div><div class="line">        &#125;</div><div class="line">    &#125;)</div><div class="line">    .done(<span class="function"><span class="keyword">function</span>(<span class="params">data, status, xhr</span>) </span>&#123;</div><div class="line">        <span class="built_in">console</span>.log(data)</div><div class="line">    &#125;)</div></pre></td></tr></table></figure>
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://blog.webtoatl.cn/2017/07/09/react为什么需要key/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="赖宝">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="赖宝的宝">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/07/09/react为什么需要key/" itemprop="url">
-                  react为什么需要key
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-07-09T00:00:00+08:00">
-                2017-07-09
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="多个react组件性能优化"><a href="#多个react组件性能优化" class="headerlink" title="多个react组件性能优化"></a>多个react组件性能优化</h2><h3 id="1-1-生命周期"><a href="#1-1-生命周期" class="headerlink" title="1.1 生命周期"></a>1.1 生命周期</h3><ol>
-<li><p>当一个react组件被装载、更新和卸载时，组件的一系列生命周期函数会被调用。不过这些生命周期函数是针对某一个特定的react组件的函数，在一个应用中，从上到下有很多react组件组合起来，它们之间的渲染过程更加复杂。</p>
-</li>
-<li><p>其中，装载阶段基本上没有什么选择，当一个react组件第一次出现在DOM树中时，无论如何都是要彻底渲染一次的，从这个react组件往下的所有子组件，都要经历一遍react组件的装载生命周期，因为这部分的的工作没有什么可以省略的，所以没有多少性能优化的事情可以做。</p>
-</li>
-<li><p>至于卸载阶段，只有一个生命周期函数 <strong>componentWillUnmount</strong>，这个函数做的事情知识清理 <strong>componentDidMount</strong> 添加的事件处理监听等收尾工作，做的事情比装载过程要少很多，所以也没什么可以优化的空间。</p>
-</li>
-<li><p>所以值得关注的过程，就只剩下了更新过程。</p>
-</li>
-</ol>
-<h3 id="1-2-react的调和-reconciliation-过程"><a href="#1-2-react的调和-reconciliation-过程" class="headerlink" title="1.2 react的调和(reconciliation)过程"></a>1.2 react的调和(reconciliation)过程</h3><p>react在更新阶段很巧妙地对比原有的 <strong>Virtual DOM</strong> 和新生成的 <strong>Virtual DOM</strong> ,找出两者的不同之处，根据不同来修改DOM树，这样只需要做做小的必要改动。react在更新这个“找不同”的过程，就叫做(reconciliation)过程。</p>
-<h3 id="1-3-react的算法时间复杂度"><a href="#1-3-react的算法时间复杂度" class="headerlink" title="1.3 react的算法时间复杂度"></a>1.3 react的算法时间复杂度</h3><ol>
-<li>Facebook推出的react之初打出的旗号之一就是“高性能”，所以react的(reconciliation)过程必须快速。但是，找出两个树形结构的区别，从计算机科学的角度来说，真的不是一件快速的事。</li>
-<li>按照计算机科学目前的算法研究结果，对比两个N个节点的树形结构的算法，时间复杂度是 <strong>O(N^3)</strong>,打个比方，假如两个树形结构上各有100节点，那么找出这两个树形结构差别的操作，需要100*100*100次操作，也就是一百万次当量的操作，假如有一千个节点，那么需要相当于1000*1000*1000次操作，这是一亿次的操作当量，这么巨大数量的操作在强调快速反应的网页中是不可想象的，所以react不可能采用这样的算法。</li>
-<li>react实际采用的算法需要的时间复杂度是 <strong>O(N)</strong> ，因为对比两个树形怎么着都要对比两个树形上的节点，似乎也不可能有比 <strong>O(N)</strong> 时间复杂度更低的算法。react采用的算法肯定不是最精准的，但是对于react英语的场景来说，绝对是性能和复杂度的最好折衷，让这个算法发挥作用，还需要开发者一点配合。</li>
-<li>其实，react的reconciliation算法并不是很复杂，当react要对比两个 <strong>Virtual DOM</strong> 的树形结构的时候，从根节点开始递归往下比对，在树形结构上，每个阶段都可以看做一个这个阶段以下部分子树的根节点。所以其实这个对比算法可以从 <strong>Virtual DOM</strong> 上任何一个节点开始执行。</li>
-</ol>
-<h3 id="1-4-react检查两个树形结构的根节点的不同处理方式"><a href="#1-4-react检查两个树形结构的根节点的不同处理方式" class="headerlink" title="1.4 react检查两个树形结构的根节点的不同处理方式"></a>1.4 react检查两个树形结构的根节点的不同处理方式</h3><ol>
-<li>节点类型不同的情况</li>
-</ol>
-<p>如果树形结构的根节点类型不相同，那就意味着改动太大了，也不需要去费心考虑是不是原来那个树形的根节点被移动到其他地方去了，直接认为原来那个树形结构会已经没用，可以扔掉，需要重新构建新的DOM树，原有的树形结构上的react组件都会经历“卸载”的生命周期。也就是，对于 <strong>Virtual DOM</strong> 树这是一个“更新”的过程，但是却可能引发这个树形结构上某些组件的“装载”和“卸载”过程。例如，在更新之前，组件的结构是这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>我们想要更新成这样:<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;span&gt;</div><div class="line">    <span class="xml"><span class="tag">&lt;<span class="name">Todos</span> /&gt;</span></span></div><div class="line"><span class="tag">&lt;/<span class="name">span</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>那么react会认为要废掉之前的div节点，包括下面的所有的子节点，一切推到重新来，重新构建一个span节点以及其子节点。看似浪费，但是为了避免 <strong>O(N^3)</strong> 的时间复杂度，react必须要选一个更简单更快的算法，也就只能用这种方式。</p>
-<p>作为开发者，很显然要避免作为包裹功能的节点类型被随意改变。</p>
-<ol>
-<li>节点类型相同的情况</li>
-</ol>
-<p>如果两个树形结构的根节点类型相同，react就会认为原来的根节点只需要更新过程，不会将其卸载，也不会引发根节点的重新装载。这时候要区分一下节点类型。节点可以分为两类：一类是DOM元素类型对应的就是HTML直接支持的元素类型，比如div,span,p。另一类是react组件，也就是利用react库订制的类型。</p>
-<p>对于DOM类型，react会保留节点对应的DOM元素，支队树形结构根节点上的树形和内容做一下对比，然后只更新修改的部分。<br>比如原来的jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;red&quot;,fontSize:16&#125;&#125; className=&quot;welcome&quot;&gt;</div><div class="line">    hello</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
-<p>改变后jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&lt;div style=&#123;&#123;color:&quot;green&quot;,fontSize:16&#125;&#125; className=&quot;farewell&quot;&gt;</div><div class="line">    good bye</div><div class="line">&lt;/div&gt;</div></pre></td></tr></table></figure></p>
-<p>这两个的差别就是颜色和className发生了改变，在操作DOM树节点的时候，只修改这些发生变化的部分，让DOM操作尽可能少。</p>
-<p>如果树形结构的根节点不是DOM元素类型，react所做的工作类似，只是react不知道如何去更新DOM树，因为这些逻辑还在react组件之中，react能做的只是根据新节点的props去更新原来根节点的组件实例，引发这个组件的实例的更新过程。也就会触发react更新阶段的生命周期函数，这个过程中，如果 <strong>shouldComponentUpdate</strong> 返回false。更新就会停止。</p>
-<ol>
-<li>多个子组件的情况</li>
-</ol>
-<p>当一个组件包含多个子组件的情况，react的处理方式也非常简单的直接。例如最初组件形态用jsx表示是这样:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>更新之后，jsx表示是这样的:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;third&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>这种情况react的更新过程，只要 <strong>shouldComponentUpdate</strong> 使用恰当，可以避免实质性的更新操作。</p>
-<p>但是，在序列前面增加一个 TodoItem实例的时候。需要更新后的形态jsx表示为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>这种情况下，react会首先认为把text为first的组件实例的text改为zero，text为second的组件实例的text改为first，最后增加一个一个实例，text为second。这种情况下，<strong>shouldComponentUpdate</strong> 也无法判断是否返回false。想要增加一个组件实例，却引发了另外两个组件的更新。</p>
-<p>这种情况，react的key就凸显出作用了。react通过这个key就能判断每一个组件在组件序列中的位置了。</p>
-<p>上面的情况变为，最初形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>新增组件的时候,形态为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;ul&gt;</div><div class="line">    &lt;TodoItem key=&#123;0&#125; text=&quot;zero&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;1&#125; text=&quot;first&quot; completed=&#123;false&#125; /&gt;</div><div class="line">    &lt;TodoItem key=&#123;2&#125; text=&quot;second&quot; completed=&#123;false&#125; /&gt;</div><div class="line">&lt;/ul&gt;</div></pre></td></tr></table></figure></p>
-<p>react就知道把组件插在组件序列的第一位了。对原有的两个组件，只用props来启用更新过程，_shouldComponentUpdate__ 就能根据key来判断是否返回false来中断更新了，避免无用的更新操作了。</p>
-<h3 id="1-5-总结"><a href="#1-5-总结" class="headerlink" title="1.5 总结"></a>1.5 总结</h3><p>所以，碰到数组-&gt;列表的映射，或是同级元素需要移位的情况，一定要给元素加上key属性！</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2247,7 +2498,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">22</span>
+                <span class="site-state-item-count">25</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
